@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Dashboard</title>
+
     <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 
@@ -9,35 +10,56 @@
 
 <div class="header">
     <h2>🚀 AI Debate Partner</h2>
-    <a href="/" class="logout-btn">Logout</a>
+
+    <a href="/" class="logout-btn">
+        Logout
+    </a>
 </div>
 
 <div class="container">
 
-    <h1 class="title">Choose Your Mode</h1>
+    <h1 class="title">
+        Choose Your Mode
+    </h1>
 
     <div class="card-container">
-        <div class="card glow" onclick="location.href='/topic?mode=ai'">
+
+        <div class="card glow"
+             onclick="location.href='/topic?mode=ai'">
+
             <h2>🤖 AI Debate</h2>
             <p>Challenge AI with logic</p>
+
         </div>
 
-        <div class="card glow" onclick="location.href='/create-room'">
+        <div class="card glow"
+             onclick="location.href='/create-room'">
+
             <h2>👥 Human Debate</h2>
             <p>Debate with real users</p>
+
         </div>
+
     </div>
 
     <div class="card-container">
-        <div class="card glass" onclick="loadHistory()">
+
+        <div class="card glass"
+             onclick="loadHistory()">
+
             <h3>📜 History</h3>
             <p>View debates</p>
+
         </div>
 
-        <div class="card glass" onclick="showResult()">
+        <div class="card glass"
+             onclick="showResult()">
+
             <h3>🏆 Result</h3>
             <p>Last debate outcome</p>
+
         </div>
+
     </div>
 
     <div id="display-section"></div>
@@ -46,70 +68,138 @@
 
 <script>
 
-// HISTORY
+// =========================
+// LOAD HISTORY
+// =========================
 function loadHistory(){
+
     fetch("/api/debate/history")
+
     .then(res => res.json())
+
     .then(data => {
 
-        let html = "<h2>📜 Debate History</h2>";
+        let html =
+            "<h2>📜 Debate History</h2>";
 
         if(!data || data.length === 0){
-            html += "<p>No debates yet</p>";
-        } else {
+
+            html +=
+                "<p>No debates yet</p>";
+        }
+
+        else{
+
             data.forEach(d => {
+
                 html += `
                     <div class="history-box">
-                        <p><b>Topic:</b> ${d.topic}</p>
-                        <p><b>Winner:</b> ${d.winner}</p>
+
+                        <p>
+                            <b>Topic:</b>
+                            ${d.topic || "N/A"}
+                        </p>
+
+                        <p>
+                            <b>Winner:</b>
+                            ${d.winner || "N/A"}
+                        </p>
+
                     </div>
                 `;
             });
         }
 
-        document.getElementById("display-section").innerHTML = html;
+        document.getElementById(
+            "display-section"
+        ).innerHTML = html;
     })
-    .catch(() => {
-        document.getElementById("display-section").innerHTML =
+
+    .catch(error => {
+
+        console.log(error);
+
+        document.getElementById(
+            "display-section"
+        ).innerHTML =
             "<p>Error loading history</p>";
     });
 }
 
-// RESULT
+
+// =========================
+// SHOW RESULT
+// =========================
 function showResult(){
+
     fetch("/api/debate/last")
-    .then(res => res.json())
+
+    .then(res => res.text())
+
     .then(data => {
 
-        let html = "<h2>🏆 Last Result</h2>";
+        let html =
+            "<h2>🏆 Last Result</h2>";
 
-        if(!data || !data.topic){
-            // fallback to localStorage
-            const w = localStorage.getItem("lastWinner");
-            const t = localStorage.getItem("lastTopic");
-            const r = localStorage.getItem("lastReason");
+        if(!data ||
+           data.includes("Database disabled")){
+
+            const w =
+                localStorage.getItem(
+                    "lastWinner"
+                );
+
+            const t =
+                localStorage.getItem(
+                    "lastTopic"
+                );
+
+            const r =
+                localStorage.getItem(
+                    "lastReason"
+                );
 
             if(!w){
-                html += "<p>No result available</p>";
-            } else {
+
+                html +=
+                    "<p>No result available</p>";
+            }
+
+            else{
+
                 html += `
-                    <p><b>Topic:</b> ${t}</p>
-                    <p><b>Winner:</b> ${w}</p>
+                    <p>
+                        <b>Topic:</b> ${t}
+                    </p>
+
+                    <p>
+                        <b>Winner:</b> ${w}
+                    </p>
+
                     <p>${r}</p>
                 `;
             }
-        } else {
+        }
+
+        else{
+
             html += `
-                <p><b>Topic:</b> ${data.topic}</p>
-                <p><b>Winner:</b> ${data.winner}</p>
-                <p>${data.result}</p>
+                <p>${data}</p>
             `;
         }
 
-        document.getElementById("display-section").innerHTML = html;
+        document.getElementById(
+            "display-section"
+        ).innerHTML = html;
     })
-    .catch(() => {
-        document.getElementById("display-section").innerHTML =
+
+    .catch(error => {
+
+        console.log(error);
+
+        document.getElementById(
+            "display-section"
+        ).innerHTML =
             "<p>Error loading result</p>";
     });
 }
