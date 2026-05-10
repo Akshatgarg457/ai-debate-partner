@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Human vs Human Setup</title>
+
+    <link rel="stylesheet" href="/css/create-room.css">
+</head>
+
+<body>
+
+<div class="main-container">
+
+    <h1>👥 Human vs Human Setup</h1>
+
+    <!-- ========================= -->
+    <!-- TABS -->
+    <!-- ========================= -->
+    <div class="tab-section">
+
+        <button
+            class="tab-btn active"
+            id="createTabBtn"
+            onclick="showCreateTab()">
+
+            Create Room
+        </button>
+
+        <button
+            class="tab-btn"
+            id="joinTabBtn"
+            onclick="showJoinTab()">
+
+            Join Room
+        </button>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- CREATE ROOM -->
+    <!-- ========================= -->
+    <div id="createSection" class="tab-content">
+
+        <h2>Create Debate Room</h2>
+
+        <!-- username auto from login -->
+        <input
+            type="text"
+            id="username"
+            placeholder="Username"
+            readonly
+        >
+
+        <br><br>
+
+        <input
+            type="text"
+            id="topic"
+            placeholder="Enter debate topic"
+        >
+
+        <br><br>
+
+        <button onclick="createRoom()">
+            Create Room
+        </button>
+
+        <!-- RESULT -->
+        <div id="resultBox" style="display:none;">
+
+            <h3>Room Created 🎉</h3>
+
+            <input
+                type="text"
+                id="roomIdDisplay"
+                readonly
+            >
+
+            <br><br>
+
+            <button onclick="copyRoomId()">
+                Copy ID
+            </button>
+
+            <button onclick="enterRoom()">
+                Enter Room
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- JOIN ROOM -->
+    <!-- ========================= -->
+    <div
+        id="joinSection"
+        class="tab-content"
+        style="display:none;"
+    >
+
+        <h2>Join Debate Room</h2>
+
+        <!-- username auto -->
+        <input
+            type="text"
+            id="joinUsername"
+            readonly
+        >
+
+        <br><br>
+
+        <input
+            type="text"
+            id="joinRoomId"
+            placeholder="Enter Room ID"
+        >
+
+        <br><br>
+
+        <button onclick="joinRoom()">
+            Join Debate
+        </button>
+
+    </div>
+
+</div>
+
+<script src="/js/create-room.js"></script>
+
+<script>
+
+// =========================
+// AUTO USERNAME
+// =========================
+window.onload = function(){
+
+    let savedUser =
+        localStorage.getItem("username") || "guest";
+
+    document.getElementById("username").value =
+        savedUser;
+
+    document.getElementById("joinUsername").value =
+        savedUser;
+
+    // TOPIC AUTO FILL
+    let params =
+        new URLSearchParams(window.location.search);
+
+    let topic =
+        params.get("topic");
+
+    if(topic){
+        document.getElementById("topic").value = topic;
+    }
+}
+
+</script>
+
+</body>
+</html>

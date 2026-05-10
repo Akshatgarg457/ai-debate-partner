@@ -1,0 +1,201 @@
+body{
+
+    margin: 0;
+
+    font-family: Arial, sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f172a,
+            #1e293b
+        );
+
+    color: white;
+
+    min-height: 100vh;
+}
+
+/* ========================= */
+/* TOP */
+/* ========================= */
+
+.top-bar{
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 20px;
+
+    background: rgba(255,255,255,0.05);
+
+    backdrop-filter: blur(10px);
+}
+
+.room-info p{
+    margin: 5px;
+}
+
+/* ========================= */
+/* WAITING */
+/* ========================= */
+
+#waitingBox{
+
+    text-align: center;
+
+    margin-top: 100px;
+}
+
+/* ========================= */
+/* MAIN */
+/* ========================= */
+
+#debateBox{
+
+    width: 80%;
+
+    margin: auto;
+
+    margin-top: 30px;
+}
+
+/* ========================= */
+/* CHAT */
+/* ========================= */
+
+#chatBox{
+
+    height: 400px;
+
+    overflow-y: auto;
+
+    background: rgba(255,255,255,0.05);
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    margin-top: 20px;
+}
+
+/* ========================= */
+/* MESSAGE */
+/* ========================= */
+
+.message{
+
+    background: rgba(255,255,255,0.08);
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    margin-bottom: 10px;
+}
+
+/* ========================= */
+/* STATUS */
+/* ========================= */
+
+.status-msg{
+
+    text-align: center;
+
+    color: #94a3b8;
+
+    margin: 10px;
+}
+
+/* ========================= */
+/* INPUT */
+/* ========================= */
+
+.message-section{
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+#messageInput{
+
+    flex: 1;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    border: none;
+}
+
+#messageInput:disabled{
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+/* ========================= */
+/* BUTTON */
+/* ========================= */
+
+button{
+
+    padding: 12px 20px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    background: #3b82f6;
+
+    color: white;
+
+    font-weight: bold;
+}
+
+button:hover{
+
+    opacity: 0.9;
+}
+
+#endBtn{
+
+    background: crimson;
+
+    margin-top: 20px;
+}
+
+/* ========================= */
+/* RESULT */
+/* ========================= */
+
+#resultBox{
+
+    margin-top: 30px;
+
+    background: rgba(255,255,255,0.08);
+
+    padding: 20px;
+
+    border-radius: 15px;
+}
+
+.ai-result{
+
+    margin-top: 15px;
+
+    line-height: 1.8;
+
+    font-size: 17px;
+
+    color: #e2e8f0;
+}

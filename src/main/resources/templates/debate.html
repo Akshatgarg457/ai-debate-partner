@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debate</title>
+    <link rel="stylesheet" href="/css/debate.css">
+</head>
+
+<body>
+
+<div class="header">
+    <h2 id="modeTitle">Debate Mode</h2>
+    <a href="/dashboard" class="back-btn">← Back</a>
+</div>
+
+<div class="container">
+
+    <h1>Start Your Debate</h1>
+    <h2 id="topicTitle">Topic: Loading...</h2>
+
+    <div id="chatBox" class="chat-box"></div>
+
+    <div class="input-section">
+        <textarea id="argument" placeholder="Type your argument..."></textarea>
+        <button onclick="sendArgument()" id="sendBtn">Send</button>
+        <button onclick="endDebate()" class="end-btn">End Debate</button>
+    </div>
+
+</div>
+
+<div id="resultBox" class="result-bottom"></div>
+
+<script>
+
+// =========================
+// INIT
+// =========================
+const params = new URLSearchParams(window.location.search);
+let topic = params.get("topic") || "General Debate";
+let mode = params.get("mode") || "ai";
+
+// USERNAME (IMPORTANT FOR DB)
+let username = localStorage.getItem("username") || "guest";
+
+let lastUserArg = "";
+let lastAiArg = "";
+let isLoading = false;
+
+// SET UI
+document.getElementById("topicTitle").innerText = "Topic: " + topic;
+document.getElementById("modeTitle").innerText =
+    mode === "human" ? "Human Debate 👥" : "AI Debate 🤖";
+
+// =========================
+// CHAT APPEND
+// =========================
+function appendMsg(type, text){
+    const chat = document.getElementById("chatBox");
+
+    chat.innerHTML += `<div class="msg ${type}">${text}</div>`;
+
+    // AUTO SCROLL
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// =========================
+// SEND ARGUMENT
+// =========================
+function sendArgument(){
+
+    if(isLoading) return;
+
+    const input = document.getElementById("argument");
+    const text = input.value.trim();
+
+    if(text === "") return;
+
+    lastUserArg = text;
+
+    appendMsg("user", `<b>You:</b> ${text}`);
+    input.value = "";
+
+    if(mode === "human"){
+        appendMsg("opponent", `<b>Opponent:</b> ${text}`);
+        return;
+    }
+
+    isLoading = true;
+    document.getElementById("sendBtn").disabled = true;
+
+    const typingId = "typing-" + Date.now();
+
+    appendMsg("ai", `<span id="${typingId}"><b>AI:</b> typing...</span>`);
+
+    fetch("/api/debate/reply", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+            topic: topic,
+            argument: text
+        })
+    })
+    .then(res => res.text())
+    .then(data => {
+
+        // REMOVE REPETITION ISSUE
+        if(data.toLowerCase().includes("i strongly disagree")){
+            data = data.replace(/i strongly disagree/gi, "That argument fails because");
+        }
+
+        lastAiArg = data;
+
+        document.getElementById(typingId).innerHTML = `<b>AI:</b> ${data}`;
+    })
+    .catch(() => {
+        document.getElementById(typingId).innerHTML = "Error: AI not responding";
+    })
+    .finally(() => {
+        isLoading = false;
+        document.getElementById("sendBtn").disabled = false;
+    });
+}
+
+// =========================
+// END DEBATE (SAVE + RESULT)
+// =========================
+function endDebate(){
+
+    if(!lastUserArg || !lastAiArg){
+        alert("Complete at least one round!");
+        return;
+    }
+
+    document.getElementById("resultBox").innerHTML =
+        `<div class="result-card">Analyzing debate...</div>`;
+
+    fetch("/api/debate/analyze", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({
+            topic: topic,
+            userArg: lastUserArg,
+            aiArg: lastAiArg,
+            username: username   // 🔥 IMPORTANT
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        document.getElementById("resultBox").innerHTML = `
+            <div class="result-card">
+                <h2>🏆 Debate Result</h2>
+                <p>${data.result}</p>
+                <p><b>Winner:</b> ${data.winner}</p>
+            </div>
+        `;
+
+        // SAVE FOR DASHBOARD
+        localStorage.setItem("lastWinner", data.winner || "");
+        localStorage.setItem("lastTopic", data.topic || topic);
+        localStorage.setItem("lastReason", data.result || "");
+
+    })
+    .catch(() => {
+        document.getElementById("resultBox").innerHTML =
+            `<div class="result-card">Error analyzing debate</div>`;
+    });
+}
+
+</script>
+
+</body>
+</html>

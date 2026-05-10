@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Topic</title>
+    <link rel="stylesheet" href="/css/topic.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h2>🎯 Select Debate Topic</h2>
+    <a href="/dashboard" class="back-btn">← Back</a>
+</div>
+
+<div class="container">
+
+    <h1 class="title">Choose a Topic</h1>
+
+    <!-- TOPIC GRID -->
+    <div class="topic-container">
+
+        <div class="topic-card" onclick="selectTopic(this)">
+            Social media is harmful
+        </div>
+
+        <div class="topic-card" onclick="selectTopic(this)">
+            Online education vs offline
+        </div>
+
+        <div class="topic-card" onclick="selectTopic(this)">
+            AI will replace jobs
+        </div>
+
+        <div class="topic-card" onclick="selectTopic(this)">
+            Technology improves life
+        </div>
+
+        <div class="topic-card" onclick="selectTopic(this)">
+            Gaming is beneficial
+        </div>
+
+        <div class="topic-card" onclick="selectTopic(this)">
+            Climate change is real
+        </div>
+
+    </div>
+
+    <!-- CUSTOM TOPIC -->
+    <div class="custom-section">
+
+        <input
+            type="text"
+            id="customTopic"
+            placeholder="Or enter your own topic..."
+        >
+
+    </div>
+
+    <!-- START BUTTON -->
+    <button class="start-btn" onclick="startDebate()">
+        Start Debate 🚀
+    </button>
+
+</div>
+
+<script>
+
+let selectedTopic = "";
+
+// =========================
+// SELECT TOPIC
+// =========================
+function selectTopic(element){
+
+    // REMOVE OLD ACTIVE
+    document.querySelectorAll(".topic-card").forEach(card => {
+        card.classList.remove("active");
+    });
+
+    // ADD ACTIVE
+    element.classList.add("active");
+
+    // SAVE TOPIC
+    selectedTopic = element.innerText;
+}
+
+// =========================
+// START DEBATE
+// =========================
+function startDebate(){
+
+    const custom =
+        document.getElementById("customTopic").value;
+
+    // CUSTOM TOPIC
+    if(custom.trim() !== ""){
+        selectedTopic = custom;
+    }
+
+    // VALIDATION
+    if(selectedTopic === ""){
+        alert("Please select or enter a topic!");
+        return;
+    }
+
+    // GET MODE
+    const params =
+        new URLSearchParams(window.location.search);
+
+    const mode = params.get("mode") || "ai";
+
+    // =========================
+    // AI MODE
+    // =========================
+    if(mode === "ai"){
+
+        window.location.href =
+            `/debate?topic=${encodeURIComponent(selectedTopic)}&mode=ai`;
+    }
+
+    // =========================
+    // HUMAN MODE
+    // =========================
+    else{
+
+        window.location.href =
+            `/create-room?topic=${encodeURIComponent(selectedTopic)}`;
+    }
+}
+
+</script>
+
+</body>
+</html>

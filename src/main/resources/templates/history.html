@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History</title>
+</head>
+<body>
+
+<h2>Debate History</h2>
+<div id="historyBox"></div>
+
+<script>
+
+fetch("/api/debate/history")
+.then(res => res.json())
+.then(data => {
+
+    let html = "";
+
+    data.forEach(d => {
+        html += `
+            <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+                <b>Topic:</b> ${d.topic}<br>
+                <b>You:</b> ${d.user}<br>
+                <b>AI:</b> ${d.ai}<br>
+                <b>Result:</b> ${d.result}
+            </div>
+        `;
+    });
+
+    document.getElementById("historyBox").innerHTML = html;
+});
+
+</script>
+
+</body>
+</html>

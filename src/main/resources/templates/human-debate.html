@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Human Debate</title>
+
+    <link rel="stylesheet"
+          href="/css/human-debate.css">
+
+    <!-- WebSocket -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+
+</head>
+
+<body>
+
+<!-- TOP -->
+<div class="top-bar">
+
+    <h2>👥 Human Debate</h2>
+
+    <div class="room-info">
+
+        <p>
+            Room:
+            <span id="roomIdText"></span>
+        </p>
+
+        <p>
+            Players:
+            <span id="playerStatus">
+                1 / 2
+            </span>
+        </p>
+
+    </div>
+
+</div>
+
+<!-- WAITING -->
+<div id="waitingBox">
+
+    <h2>
+        ⏳ Waiting for opponent...
+    </h2>
+
+</div>
+
+<!-- MAIN -->
+<div id="debateBox"
+     style="display:none;">
+
+    <h3>
+        Topic:
+        <span id="topic"></span>
+    </h3>
+
+    <!-- CHAT -->
+    <div id="chatBox"></div>
+
+    <!-- INPUT -->
+    <div class="message-section">
+
+        <input
+            type="text"
+            id="messageInput"
+            placeholder="Type message"
+        >
+
+        <button onclick="sendMessage()">
+            Send
+        </button>
+
+    </div>
+
+    <!-- END -->
+    <br>
+
+    <button id="endBtn"
+            onclick="endDebate()">
+
+        🏆 End Debate
+
+    </button>
+
+    <!-- RESULT -->
+    <div id="resultBox"
+         style="display:none;">
+
+        <h2>🏆 Debate Result</h2>
+
+        <h3>
+            Winner:
+            <span id="winnerText"></span>
+        </h3>
+
+        <div id="resultText"></div>
+
+    </div>
+
+</div>
+
+<script src="/js/human-debate.js"></script>
+
+</body>
+</html>
