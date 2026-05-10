@@ -16,8 +16,9 @@ public class DebateController {
     @Autowired
     private GroqService groqService;
 
-    @Autowired
-    private DebateRepository debateRepository;
+    // REMOVE DATABASE FOR NOW
+    // @Autowired
+    // private DebateRepository debateRepository;
 
     // =========================
     // AI REPLY
@@ -32,7 +33,7 @@ public class DebateController {
     }
 
     // =========================
-    // ANALYZE + SAVE
+    // ANALYZE
     // =========================
     @PostMapping("/analyze")
     public Map<String, String> analyze(@RequestBody Map<String, String> body) {
@@ -40,7 +41,6 @@ public class DebateController {
         String topic = body.get("topic");
         String userArg = body.get("userArg");
         String aiArg = body.get("aiArg");
-        String username = body.get("username");
 
         // AI ANALYSIS
         String resultText =
@@ -63,23 +63,7 @@ public class DebateController {
             resultText = "Analysis failed.";
         }
 
-        // =========================
-        // SAVE TO DATABASE
-        // =========================
-        Debate debate = new Debate();
-
-        debate.setUsername(username);
-        debate.setTopic(topic);
-        debate.setUserArgument(userArg);
-        debate.setAiArgument(aiArg);
-        debate.setResult(resultText);
-        debate.setWinner(winner);
-
-        debateRepository.save(debate);
-
-        // =========================
         // RESPONSE
-        // =========================
         Map<String, String> response = new HashMap<>();
 
         response.put("topic", topic);
@@ -90,23 +74,24 @@ public class DebateController {
     }
 
     // =========================
-    // HISTORY
+    // TEMP HISTORY
     // =========================
     @GetMapping("/history")
-    public List<Debate> getHistory() {
-        return debateRepository.findAll();
+    public List<String> getHistory() {
+
+        List<String> list = new ArrayList<>();
+
+        list.add("Database disabled temporarily.");
+
+        return list;
     }
 
     // =========================
-    // LAST RESULT
+    // TEMP LAST RESULT
     // =========================
     @GetMapping("/last")
-    public Debate getLastResult() {
+    public String getLastResult() {
 
-        List<Debate> list = debateRepository.findAll();
-
-        return list.isEmpty()
-                ? null
-                : list.get(list.size() - 1);
+        return "Database disabled temporarily.";
     }
 }

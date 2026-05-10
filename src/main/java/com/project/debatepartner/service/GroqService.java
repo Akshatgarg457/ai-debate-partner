@@ -13,15 +13,9 @@ public class GroqService {
     @Value("${groq.api.key}")
     private String apiKey;
 
-    // =========================
-    // API URL
-    // =========================
     private final String API_URL =
             "https://api.groq.com/openai/v1/chat/completions";
 
-    // =========================
-    // REST TEMPLATE
-    // =========================
     private final RestTemplate restTemplate =
             new RestTemplate();
 
@@ -32,7 +26,10 @@ public class GroqService {
 
         try{
 
-            // HEADERS
+            if(apiKey == null || apiKey.isEmpty()){
+                return "Groq API key missing.";
+            }
+
             HttpHeaders headers =
                     new HttpHeaders();
 
@@ -42,19 +39,15 @@ public class GroqService {
 
             headers.setBearerAuth(apiKey);
 
-            // MESSAGE
             Map<String, String> message =
                     new HashMap<>();
 
             message.put("role", "user");
-
             message.put("content", prompt);
 
-            // BODY
             Map<String, Object> body =
                     new HashMap<>();
 
-            // ✅ WORKING MODEL
             body.put(
                     "model",
                     "llama-3.3-70b-versatile"
@@ -70,11 +63,9 @@ public class GroqService {
                     0.5
             );
 
-            // REQUEST
             HttpEntity<Map<String, Object>> request =
                     new HttpEntity<>(body, headers);
 
-            // RESPONSE
             ResponseEntity<Map> response =
                     restTemplate.exchange(
                             API_URL,
@@ -83,10 +74,17 @@ public class GroqService {
                             Map.class
                     );
 
-            // EXTRACT RESPONSE
+            if(response.getBody() == null){
+                return "Empty AI response.";
+            }
+
             List choices =
                     (List) response.getBody()
                             .get("choices");
+
+            if(choices == null || choices.isEmpty()){
+                return "No AI response.";
+            }
 
             Map choice =
                     (Map) choices.get(0);
@@ -101,7 +99,7 @@ public class GroqService {
 
             e.printStackTrace();
 
-            return "AI judge unavailable right now.";
+            return "AI service error.";
         }
     }
 
@@ -126,7 +124,7 @@ public class GroqService {
     }
 
     // =========================
-    // AI VS USER ANALYSIS
+    // ANALYZE DEBATE
     // =========================
     public String analyzeDebate(String topic,
                                 String userArg,
@@ -143,8 +141,6 @@ public class GroqService {
 
                 "AI Argument:\n" +
                 aiArg + "\n\n" +
-
-                "Analyze shortly.\n\n" +
 
                 "Give:\n" +
                 "1. Winner\n" +
@@ -164,32 +160,16 @@ public class GroqService {
 
                 "You are an AI debate judge.\n\n" +
 
-                "VERY IMPORTANT:\n" +
-                "- Use ONLY the names already present in debate\n" +
-                "- Never invent fake names\n" +
-                "- Never use names like Emma or Ryan\n" +
-                "- Use exact usernames from messages\n\n" +
-
                 "Topic:\n" +
                 topic + "\n\n" +
 
                 "Debate Messages:\n" +
                 fullDebate + "\n\n" +
 
-                "Analyze shortly and professionally.\n\n" +
-
-                "RULES:\n" +
-                "- Keep response SHORT\n" +
-                "- Max 4-5 lines\n" +
-                "- Mention actual winner name\n" +
-                "- Give short reason\n" +
-                "- Give score using real usernames\n\n" +
-
-                "FORMAT:\n\n" +
-
-                "Winner: username\n" +
-                "Reason: short reason\n" +
-                "Score: username X/10 | username X/10";
+                "Give:\n" +
+                "1. Winner\n" +
+                "2. Reason\n" +
+                "3. Score";
 
         return callGroq(prompt);
     }
