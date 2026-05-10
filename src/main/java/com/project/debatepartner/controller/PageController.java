@@ -11,16 +11,6 @@ public class PageController {
         return "login";
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
-
-    @GetMapping("/signup")
-    public String signup() {
-        return "signup";
-    }
-
     @GetMapping("/dashboard")
     public String dashboard() {
         return "dashboard";
@@ -31,9 +21,24 @@ public class PageController {
         return "topic";
     }
 
+    @GetMapping("/ai")
+    public String ai() {
+        return "ai";
+    }
+
     @GetMapping("/debate")
     public String debate() {
         return "debate";
+    }
+
+    @GetMapping("/result")
+    public String result() {
+        return "result";
+    }
+
+    @GetMapping("/history")
+    public String history() {
+        return "history";
     }
 
     @GetMapping("/create-room")
@@ -49,20 +54,5 @@ public class PageController {
     @GetMapping("/human-debate")
     public String humanDebate() {
         return "human-debate";
-    }
-
-    @GetMapping("/forget")
-    public String forget() {
-        return "forget";
-    }
-
-    @GetMapping("/result")
-    public String result() {
-        return "result";
-    }
-
-    @GetMapping("/history")
-    public String history() {
-        return "history";
     }
 }
