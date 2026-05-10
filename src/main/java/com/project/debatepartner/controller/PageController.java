@@ -12,18 +12,13 @@ public class PageController {
     }
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String login() {
         return "login";
     }
 
     @GetMapping("/signup")
-    public String signupPage() {
+    public String signup() {
         return "signup";
-    }
-
-    @GetMapping("/forget")
-    public String forgetPage() {
-        return "forget";
     }
 
     @GetMapping("/dashboard")
@@ -31,38 +26,8 @@ public class PageController {
         return "dashboard";
     }
 
-    @GetMapping("/topic")
-    public String topicPage() {
-        return "topic";
-    }
-
-    @GetMapping("/debate")
-    public String debate() {
-        return "debate";
-    }
-
-    @GetMapping("/result")
-    public String resultPage() {
-        return "result";
-    }
-
-    @GetMapping("/history")
-    public String history() {
-        return "history";
-    }
-    
-      @GetMapping("/create-room")
-    public String createRoomPage() {
-        return "create-room";
-    }
-
-    @GetMapping("/join-room")
-    public String joinRoomPage() {
-        return "join-room";
-    }
-
     @GetMapping("/human-debate")
-    public String debatePage() {
+    public String humanDebate() {
         return "human-debate";
     }
 }
