@@ -3,9 +3,12 @@ package com.project.debatepartner.repository;
 import com.project.debatepartner.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+import java.util.Optional;
 
-    User findByUsername(String username);
+public interface UserRepository
+        extends JpaRepository<User, Integer> {
 
-    User findByEmail(String email);
+    Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmail(String email);
 }

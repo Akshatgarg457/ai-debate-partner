@@ -7,36 +7,26 @@ import java.util.UUID;
 public class DebateRoom {
 
     private String roomId;
-
     private String topic;
-
     private String player1;
-
     private String player2;
-
     private boolean started = false;
 
     private List<Message> messages = new ArrayList<>();
 
-    // =========================
-    // CONSTRUCTOR
-    // =========================
+    private String result;
+    private String winner;
+
     public DebateRoom() {
         this.roomId = UUID.randomUUID().toString();
     }
 
     public DebateRoom(String topic, String player1) {
-
         this.roomId = UUID.randomUUID().toString();
-
         this.topic = topic;
-
         this.player1 = player1;
     }
 
-    // =========================
-    // GETTERS
-    // =========================
     public String getRoomId() {
         return roomId;
     }
@@ -61,9 +51,14 @@ public class DebateRoom {
         return messages;
     }
 
-    // =========================
-    // SETTERS
-    // =========================
+    public String getResult() {
+        return result;
+    }
+
+    public String getWinner() {
+        return winner;
+    }
+
     public void setTopic(String topic) {
         this.topic = topic;
     }
@@ -80,52 +75,15 @@ public class DebateRoom {
         this.started = started;
     }
 
-    // =========================
-    // ADD MESSAGE
-    // =========================
-    public void addMessage(Message message) {
-        this.messages.add(message);
-    }
-
-    // =========================
-    // PLAYER COUNT
-    // =========================
-    public int getPlayerCount(){
-
-        int count = 0;
-
-        if(player1 != null) count++;
-
-        if(player2 != null) count++;
-
-        return count;
-    }
-    // =========================
-    // RESULT
-    // =========================
-    private String result;
-
-    private String winner;
-
-    // =========================
-    // GET RESULT
-    // =========================
-    public String getResult() {
-        return result;
-    }
-
     public void setResult(String result) {
         this.result = result;
     }
 
-    // =========================
-    // GET WINNER
-    // =========================
-    public String getWinner() {
-        return winner;
-    }
-
     public void setWinner(String winner) {
         this.winner = winner;
+    }
+
+    public void addMessage(Message message) {
+        this.messages.add(message);
     }
 }
