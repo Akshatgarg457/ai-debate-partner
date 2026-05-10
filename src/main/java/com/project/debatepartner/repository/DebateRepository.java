@@ -1,10 +1,10 @@
 package com.project.debatepartner.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import com.project.debatepartner.model.Debate;
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface DebateRepository extends JpaRepository<Debate, Integer> {
+@Repository
+public interface DebateRepository extends JpaRepository<Debate, Long> {
 
-    List<Debate> findByUsername(String username);
 }
