@@ -15,6 +15,9 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    // =========================
+    // LOGIN
+    // =========================
     @PostMapping("/login")
     public String login(@RequestParam String username,
                         @RequestParam String password) {
@@ -23,15 +26,23 @@ public class AuthController {
                 .findByUsername(username)
                 .orElse(null);
 
-        if (user != null &&
-                user.getPassword().equals(password)) {
-
-            return "redirect:/dashboard";
+        // USER NOT FOUND
+        if(user == null){
+            return "redirect:/login?error=user";
         }
 
-        return "redirect:/login?error=true";
+        // WRONG PASSWORD
+        if(!user.getPassword().equals(password)){
+            return "redirect:/login?error=password";
+        }
+
+        // SUCCESS
+        return "redirect:/dashboard";
     }
 
+    // =========================
+    // SIGNUP
+    // =========================
     @PostMapping("/signup")
     public String signup(@RequestParam String fullName,
                          @RequestParam String email,
@@ -41,18 +52,22 @@ public class AuthController {
                          @RequestParam("securityQ") String securityQuestion,
                          @RequestParam String answer) {
 
+        // PASSWORD CHECK
         if (!password.equals(confirmPassword)) {
             return "redirect:/signup?error=password";
         }
 
+        // USERNAME EXISTS
         if (userRepository.findByUsername(username).isPresent()) {
             return "redirect:/signup?error=username";
         }
 
+        // EMAIL EXISTS
         if (userRepository.findByEmail(email).isPresent()) {
             return "redirect:/signup?error=email";
         }
 
+        // CREATE USER
         User user = new User();
 
         user.setFullName(fullName);
@@ -64,9 +79,13 @@ public class AuthController {
 
         userRepository.save(user);
 
-        return "redirect:/login?signup=success";
+        // SUCCESS
+        return "redirect:/login?success=signup";
     }
 
+    // =========================
+    // GET SECURITY QUESTION
+    // =========================
     @GetMapping("/get-question")
     @ResponseBody
     public String getQuestion(@RequestParam String username) {
@@ -82,6 +101,9 @@ public class AuthController {
         return user.getSecurityQuestion();
     }
 
+    // =========================
+    // VERIFY ANSWER
+    // =========================
     @PostMapping("/verify-answer")
     @ResponseBody
     public String verifyAnswer(
@@ -108,12 +130,16 @@ public class AuthController {
         return "INVALID";
     }
 
+    // =========================
+    // RESET PASSWORD
+    // =========================
     @PostMapping("/reset-password")
     public String resetPassword(
             @RequestParam String username,
             @RequestParam String newPassword,
             @RequestParam String confirmPassword) {
 
+        // PASSWORD MATCH CHECK
         if (!newPassword.equals(confirmPassword)) {
             return "redirect:/forget?error=password";
         }
@@ -122,14 +148,17 @@ public class AuthController {
                 .findByUsername(username)
                 .orElse(null);
 
+        // USER NOT FOUND
         if (user == null) {
             return "redirect:/forget?error=user";
         }
 
+        // UPDATE PASSWORD
         user.setPassword(newPassword);
 
         userRepository.save(user);
 
-        return "redirect:/login?reset=true";
+        // SUCCESS
+        return "redirect:/login?success=reset";
     }
 }

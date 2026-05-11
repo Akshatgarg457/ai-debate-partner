@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <title>Forgot Password</title>
-<link rel="stylesheet" href="/css/forget.css">
+
+<link rel="stylesheet"
+href="/css/forget.css">
+
 </head>
 
 <body>
@@ -14,114 +19,66 @@
 
 <h2>FORGOT PASSWORD</h2>
 
-<!-- STEP 1 -->
-<input type="text" id="username" placeholder="Enter Username">
-<input type="button" value="Search" onclick="searchUser()">
+<input type="text"
+id="username"
+placeholder="Enter Username">
 
-<!-- STEP 2 -->
-<input type="text" id="question" readonly style="display:none;">
-<input type="text" id="answer" placeholder="Answer" style="display:none;">
-<input type="button" id="verifyBtn" value="Verify" onclick="verifyAnswer()" style="display:none;">
+<input type="button"
+value="Search"
+onclick="searchUser()">
 
-<!-- STEP 3 -->
-<form action="/reset-password" method="post" id="resetForm" style="display:none;">
+<input type="text"
+id="question"
+readonly
+style="display:none;">
 
-<input type="hidden" name="username" id="hiddenUsername">
+<input type="text"
+id="answer"
+placeholder="Answer"
+style="display:none;">
 
-<input type="password" name="newPassword" placeholder="New Password" required>
+<input type="button"
+id="verifyBtn"
+value="Verify"
+onclick="verifyAnswer()"
+style="display:none;">
+
+<form id="resetForm"
+style="display:none;">
+
+<input type="hidden"
+id="hiddenUsername">
+
+<input type="password"
+id="newPassword"
+placeholder="New Password"
+required>
 
 <br><br>
-<input type="password" name="confirmPassword" placeholder="Confirm Password" required>
 
-<input type="submit" value="Reset Password">
+<input type="password"
+id="confirmPassword"
+placeholder="Confirm Password"
+required>
+
+<input type="submit"
+value="Reset Password">
 
 </form>
 
 <div class="group">
-<a href="/login">Back to Login</a>
-</div>
+
+<a href="/login">
+Back to Login
+</a>
 
 </div>
+
 </div>
 </div>
+</div>
 
-<script>
-
-const questions = {
-    anime: "Your Favorite Anime Character",
-    superhero: "Your Favorite Superhero",
-    cricketer: "Your Favorite Cricketer",
-    lucky: "Your Lucky Number",
-    nickname: "Your Childhood Nickname"
-};
-
-let currentUser = "";
-let currentQuestion = "";
-
-// STEP 1
-function searchUser(){
-
-    let user = document.getElementById("username").value;
-
-    if(user === ""){
-        alert("Enter username");
-        return;
-    }
-
-    fetch("/get-question?username=" + user)
-    .then(res => res.text())
-    .then(data => {
-
-        if(data === "NOT_FOUND"){
-            alert("User not found");
-            return;
-        }
-
-        currentUser = user;
-        currentQuestion = data;
-
-        document.getElementById("question").style.display = "block";
-        document.getElementById("answer").style.display = "block";
-        document.getElementById("verifyBtn").style.display = "block";
-
-        document.getElementById("question").value = questions[data];
-    });
-}
-
-// STEP 2
-function verifyAnswer(){
-
-    let answer = document.getElementById("answer").value;
-
-    if(answer === ""){
-        alert("Enter answer");
-        return;
-    }
-
-    fetch("/verify-answer", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            username: currentUser,
-            question: currentQuestion,
-            answer: answer
-        })
-    })
-    .then(res => res.text())
-    .then(data => {
-
-        if(data === "VALID"){
-
-            document.getElementById("resetForm").style.display = "block";
-            document.getElementById("hiddenUsername").value = currentUser;
-
-        } else {
-            alert("Wrong answer!");
-        }
-    });
-}
-
-</script>
+<script src="/js/forget.js"></script>
 
 </body>
 </html>

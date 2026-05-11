@@ -1,17 +1,43 @@
-// =========================
-// LOGIN FORM
-// =========================
-const form =
-    document.getElementById("loginForm");
+document
+.getElementById("loginForm")
 
-// =========================
-// SAVE USERNAME
-// =========================
-form.addEventListener("submit", function(){
+.addEventListener("submit", function(e){
 
-    const username =
+    e.preventDefault();
+
+    let username =
         document.getElementById("username").value;
 
-    // SAVE USERNAME
-    localStorage.setItem("username", username);
+    let password =
+        document.getElementById("password").value;
+
+    fetch(
+        `/login?username=${username}&password=${password}`,
+        {
+            method: "POST"
+        }
+    )
+
+    .then(res => res.text())
+
+    .then(data => {
+
+        if(data.includes("dashboard")){
+
+            localStorage.setItem(
+                "username",
+                username
+            );
+
+            window.location.href =
+                "/dashboard";
+        }
+
+        else{
+
+            alert(
+                "User does not exist or password is incorrect"
+            );
+        }
+    });
 });

@@ -26,33 +26,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
                 LOGIN
             </h2>
 
-            <!-- ERROR / SUCCESS -->
-            <p style="color:red; text-align:center;">
-
-                <script>
-
-                if(window.location.search.includes("error=true")){
-                    document.write("Invalid username or password");
-                }
-
-                if(window.location.search.includes("success=true")){
-                    document.write("Signup successful! Please login.");
-                }
-
-                if(window.location.search.includes("reset=true")){
-                    document.write("Password reset successful!");
-                }
-
-                </script>
-
-            </p>
-
-            <!-- LOGIN FORM -->
-            <form id="loginForm" action="/login" method="post">
+            <form id="loginForm">
 
                 <input
                     type="text"
-                    name="username"
                     id="username"
                     placeholder="Username"
                     required
@@ -60,7 +37,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
                 <input
                     type="password"
-                    name="password"
+                    id="password"
                     placeholder="Password"
                     required
                 >
@@ -72,7 +49,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
             </form>
 
-            <!-- LINKS -->
             <div class="group">
 
                 <a href="/forget">
@@ -91,7 +67,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
 </div>
 
-<!-- SEPARATE JS -->
 <script src="/js/login.js"></script>
 
 </body>
