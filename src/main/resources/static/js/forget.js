@@ -1,217 +1,104 @@
-const questions = {
-
-    anime:
-        "Your School Name",
-
-    superhero:
-        "Your Favorite Superhero",
-
-    cricketer:
-        "Your Favorite Cricketer",
-
-    lucky:
-        "Your Lucky Number",
-
-    nickname:
-        "Your Childhood Nickname"
-};
-
-let currentUser = "";
-let currentQuestion = "";
-
-// ================= SEARCH USER =================
+let currentUsername = "";
 
 async function searchUser() {
 
-    const user =
-        document.getElementById(
-            "username"
-        ).value;
+    currentUsername =
+        document.getElementById("username").value;
 
-    try {
+    const response =
+        await fetch(`/auth/question?username=${currentUsername}`);
 
-        const response =
-            await fetch(
-                "/auth/get-question?username=" + user
-            );
+    const data =
+        await response.json();
 
-        const result =
-            await response.json();
-
-        if (!result.success) {
-
-            alert(result.error);
-
-            return;
-        }
-
-        currentUser = user;
-
-        currentQuestion =
-            result.question;
+    if(data.success){
 
         document.getElementById(
             "question"
-        ).style.display = "block";
+        ).value = data.question;
 
-        document.getElementById(
-            "answer"
-        ).style.display = "block";
+    } else {
 
-        document.getElementById(
-            "verifyBtn"
-        ).style.display = "block";
-
-        document.getElementById(
-            "question"
-        ).value =
-            questions[result.question];
-
-    } catch (error) {
-
-        alert("Server error");
+        alert(data.error);
     }
 }
-
-// ================= VERIFY ANSWER =================
 
 async function verifyAnswer() {
 
     const answer =
-        document.getElementById(
-            "answer"
-        ).value;
+        document.getElementById("answer").value;
 
-    try {
+    const response =
+        await fetch("/auth/verify", {
 
-        const response =
-            await fetch(
-                "/auth/verify-answer",
-                {
+        method: "POST",
 
-                    method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+        body: JSON.stringify({
 
-                    body: JSON.stringify({
+            username: currentUsername,
+            answer
+        })
+    });
 
-                        username:
-                            currentUser,
+    const data =
+        await response.json();
 
-                        question:
-                            currentQuestion,
+    if(data.success){
 
-                        answer:
-                            answer
-                    })
-                });
+        alert("Answer verified");
 
-        const result =
-            await response.json();
+    } else {
 
-        if (result.success) {
-
-            document.getElementById(
-                "resetForm"
-            ).style.display = "block";
-
-            document.getElementById(
-                "hiddenUsername"
-            ).value = currentUser;
-
-        } else {
-
-            alert(result.error);
-        }
-
-    } catch (error) {
-
-        alert("Server error");
+        alert(data.error);
     }
 }
 
-// ================= RESET PASSWORD =================
+async function resetPassword() {
 
-document
-    .getElementById("resetForm")
+    const password =
+        document.getElementById("password").value;
 
-    .addEventListener(
-        "submit",
-        async function (e) {
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
 
-            e.preventDefault();
+    if(password !== confirmPassword){
 
-            const username =
-                document.getElementById(
-                    "hiddenUsername"
-                ).value;
+        alert("Passwords do not match");
+        return;
+    }
 
-            const newPassword =
-                document.getElementById(
-                    "newPassword"
-                ).value;
+    const response =
+        await fetch("/auth/reset", {
 
-            const confirmPassword =
-                document.getElementById(
-                    "confirmPassword"
-                ).value;
+        method: "POST",
 
-            if (
-                newPassword !==
-                confirmPassword
-            ) {
+        headers: {
+            "Content-Type": "application/json"
+        },
 
-                alert(
-                    "Passwords do not match"
-                );
+        body: JSON.stringify({
 
-                return;
-            }
+            username: currentUsername,
+            password
+        })
+    });
 
-            try {
+    const data =
+        await response.json();
 
-                const response =
-                    await fetch(
-                        "/auth/reset-password",
-                        {
+    if(data.success){
 
-                            method: "POST",
+        alert("Password reset successful");
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
+        window.location.href =
+            "/login";
 
-                            body: JSON.stringify({
+    } else {
 
-                                username,
-
-                                newPassword
-                            })
-                        });
-
-                const result =
-                    await response.json();
-
-                if (result.success) {
-
-                    alert(
-                        "Password reset successful"
-                    );
-
-                    window.location.href =
-                        "/login";
-
-                } else {
-
-                    alert(result.error);
-                }
-
-            } catch (error) {
-
-                alert("Server error");
-            }
-        });
+        alert(data.error);
+    }
+}

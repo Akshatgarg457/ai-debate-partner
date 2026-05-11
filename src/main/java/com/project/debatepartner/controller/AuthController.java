@@ -2,7 +2,6 @@ package com.project.debatepartner.controller;
 
 import com.project.debatepartner.model.User;
 import com.project.debatepartner.repository.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,45 +16,6 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
-    // ================= LOGIN =================
-
-    @PostMapping("/login")
-    public Map<String, Object> login(
-            @RequestBody Map<String, String> data) {
-
-        Map<String, Object> response =
-                new HashMap<>();
-
-        String username =
-                data.get("username");
-
-        String password =
-                data.get("password");
-
-        User user =
-                userRepository.findByUsername(username);
-
-        if (user == null) {
-
-            response.put("success", false);
-            response.put("error", "User not found");
-
-            return response;
-        }
-
-        if (!user.getPassword().equals(password)) {
-
-            response.put("success", false);
-            response.put("error", "Wrong password");
-
-            return response;
-        }
-
-        response.put("success", true);
-
-        return response;
-    }
-
     // ================= SIGNUP =================
 
     @PostMapping("/signup")
@@ -65,15 +25,12 @@ public class AuthController {
         Map<String, Object> response =
                 new HashMap<>();
 
-        User existingUser =
-                userRepository.findByUsername(
-                        user.getUsername()
-                );
-
-        if (existingUser != null) {
+        if(userRepository.findByUsername(
+                user.getUsername()) != null){
 
             response.put("success", false);
-            response.put("error", "Username already exists");
+            response.put("error",
+                    "Username already exists");
 
             return response;
         }
@@ -85,22 +42,67 @@ public class AuthController {
         return response;
     }
 
-    // ================= GET QUESTION =================
+    // ================= LOGIN =================
 
-    @GetMapping("/get-question")
-    public Map<String, Object> getQuestion(
-            @RequestParam String username) {
+    @PostMapping("/login")
+    public Map<String, Object> login(
+            @RequestBody Map<String,String> data){
 
         Map<String, Object> response =
                 new HashMap<>();
 
-        User user =
-                userRepository.findByUsername(username);
+        String username =
+                data.get("username");
 
-        if (user == null) {
+        String password =
+                data.get("password");
+
+        User user =
+                userRepository.findByUsername(
+                        username);
+
+        if(user == null){
 
             response.put("success", false);
-            response.put("error", "User not found");
+            response.put("error",
+                    "User not found");
+
+            return response;
+        }
+
+        if(!user.getPassword()
+                .equals(password)){
+
+            response.put("success", false);
+            response.put("error",
+                    "Wrong password");
+
+            return response;
+        }
+
+        response.put("success", true);
+
+        return response;
+    }
+
+    // ================= GET QUESTION =================
+
+    @GetMapping("/question")
+    public Map<String,Object> getQuestion(
+            @RequestParam String username){
+
+        Map<String,Object> response =
+                new HashMap<>();
+
+        User user =
+                userRepository.findByUsername(
+                        username);
+
+        if(user == null){
+
+            response.put("success", false);
+            response.put("error",
+                    "User not found");
 
             return response;
         }
@@ -117,34 +119,34 @@ public class AuthController {
 
     // ================= VERIFY ANSWER =================
 
-    @PostMapping("/verify-answer")
-    public Map<String, Object> verifyAnswer(
-            @RequestBody Map<String, String> data) {
+    @PostMapping("/verify")
+    public Map<String,Object> verifyAnswer(
+            @RequestBody Map<String,String> data){
 
-        Map<String, Object> response =
+        Map<String,Object> response =
                 new HashMap<>();
 
         User user =
                 userRepository.findByUsername(
-                        data.get("username")
-                );
+                        data.get("username"));
 
-        if (user == null) {
+        if(user == null){
 
             response.put("success", false);
-            response.put("error", "User not found");
+            response.put("error",
+                    "User not found");
 
             return response;
         }
 
-        String answer =
-                data.get("answer");
-
-        if (!user.getSecurityAnswer()
-                .equalsIgnoreCase(answer)) {
+        if(!user.getSecurityAnswer()
+                .equalsIgnoreCase(
+                        data.get("answer")
+                )){
 
             response.put("success", false);
-            response.put("error", "Wrong answer");
+            response.put("error",
+                    "Wrong answer");
 
             return response;
         }
@@ -156,28 +158,28 @@ public class AuthController {
 
     // ================= RESET PASSWORD =================
 
-    @PostMapping("/reset-password")
-    public Map<String, Object> resetPassword(
-            @RequestBody Map<String, String> data) {
+    @PostMapping("/reset")
+    public Map<String,Object> resetPassword(
+            @RequestBody Map<String,String> data){
 
-        Map<String, Object> response =
+        Map<String,Object> response =
                 new HashMap<>();
 
         User user =
                 userRepository.findByUsername(
-                        data.get("username")
-                );
+                        data.get("username"));
 
-        if (user == null) {
+        if(user == null){
 
             response.put("success", false);
-            response.put("error", "User not found");
+            response.put("error",
+                    "User not found");
 
             return response;
         }
 
         user.setPassword(
-                data.get("newPassword")
+                data.get("password")
         );
 
         userRepository.save(user);

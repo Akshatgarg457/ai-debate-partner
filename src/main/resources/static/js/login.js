@@ -1,55 +1,41 @@
-document
-    .getElementById("loginForm")
-    .addEventListener("submit", async (e) => {
+async function login() {
 
-        e.preventDefault();
+    const username =
+        document.getElementById("username").value;
 
-        const username =
-            document.getElementById("username").value;
+    const password =
+        document.getElementById("password").value;
 
-        const password =
-            document.getElementById("password").value;
+    const response = await fetch("/auth/login", {
 
-        try {
+        method: "POST",
 
-            const response =
-                await fetch("/auth/login", {
+        headers: {
+            "Content-Type": "application/json"
+        },
 
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        username,
-                        password
-                    })
-                });
-
-            const result =
-                await response.json();
-
-            if (result.success) {
-
-                localStorage.setItem(
-                    "username",
-                    username
-                );
-
-                alert("Login successful");
-
-                window.location.href =
-                    "/dashboard";
-
-            } else {
-
-                alert(result.error);
-            }
-
-        } catch (error) {
-
-            alert("Server error");
-        }
+        body: JSON.stringify({
+            username,
+            password
+        })
     });
+
+    const data = await response.json();
+
+    if(data.success){
+
+        localStorage.setItem(
+            "username",
+            username
+        );
+
+        alert("Login successful");
+
+        window.location.href =
+            "/dashboard";
+
+    } else {
+
+        alert(data.error);
+    }
+}
