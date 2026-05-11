@@ -1,46 +1,54 @@
 const questions = {
 
     anime:
-    "Your School Name",
+        "Your School Name",
 
     superhero:
-    "Your Favorite Superhero",
+        "Your Favorite Superhero",
 
     cricketer:
-    "Your Favorite Cricketer",
+        "Your Favorite Cricketer",
 
     lucky:
-    "Your Lucky Number",
+        "Your Lucky Number",
 
     nickname:
-    "Your Childhood Nickname"
+        "Your Childhood Nickname"
 };
 
 let currentUser = "";
 let currentQuestion = "";
 
-// SEARCH USER
-function searchUser(){
+// ================= SEARCH USER =================
 
-    let user =
-        document.getElementById("username").value;
+async function searchUser() {
 
-    fetch("/get-question?username=" + user)
+    const user =
+        document.getElementById(
+            "username"
+        ).value;
 
-    .then(res => res.text())
+    try {
 
-    .then(data => {
+        const response =
+            await fetch(
+                "/auth/get-question?username=" + user
+            );
 
-        if(data === "NOT_FOUND"){
+        const result =
+            await response.json();
 
-            alert("User not found");
+        if (!result.success) {
+
+            alert(result.error);
 
             return;
         }
 
         currentUser = user;
 
-        currentQuestion = data;
+        currentQuestion =
+            result.question;
 
         document.getElementById(
             "question"
@@ -56,40 +64,55 @@ function searchUser(){
 
         document.getElementById(
             "question"
-        ).value = questions[data];
-    });
+        ).value =
+            questions[result.question];
+
+    } catch (error) {
+
+        alert("Server error");
+    }
 }
 
-// VERIFY
-function verifyAnswer(){
+// ================= VERIFY ANSWER =================
 
-    let answer =
-        document.getElementById("answer").value;
+async function verifyAnswer() {
 
-    fetch("/verify-answer", {
+    const answer =
+        document.getElementById(
+            "answer"
+        ).value;
 
-        method: "POST",
+    try {
 
-        headers: {
-            "Content-Type":
-            "application/json"
-        },
+        const response =
+            await fetch(
+                "/auth/verify-answer",
+                {
 
-        body: JSON.stringify({
+                    method: "POST",
 
-            username: currentUser,
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-            question: currentQuestion,
+                    body: JSON.stringify({
 
-            answer: answer
-        })
-    })
+                        username:
+                            currentUser,
 
-    .then(res => res.text())
+                        question:
+                            currentQuestion,
 
-    .then(data => {
+                        answer:
+                            answer
+                    })
+                });
 
-        if(data === "VALID"){
+        const result =
+            await response.json();
+
+        if (result.success) {
 
             document.getElementById(
                 "resetForm"
@@ -98,62 +121,97 @@ function verifyAnswer(){
             document.getElementById(
                 "hiddenUsername"
             ).value = currentUser;
+
+        } else {
+
+            alert(result.error);
         }
 
-        else{
+    } catch (error) {
 
-            alert("Wrong answer");
-        }
-    });
+        alert("Server error");
+    }
 }
 
-// RESET PASSWORD
+// ================= RESET PASSWORD =================
+
 document
-.getElementById("resetForm")
+    .getElementById("resetForm")
 
-.addEventListener("submit", function(e){
+    .addEventListener(
+        "submit",
+        async function (e) {
 
-    e.preventDefault();
+            e.preventDefault();
 
-    let username =
-        document.getElementById(
-            "hiddenUsername"
-        ).value;
+            const username =
+                document.getElementById(
+                    "hiddenUsername"
+                ).value;
 
-    let newPassword =
-        document.getElementById(
-            "newPassword"
-        ).value;
+            const newPassword =
+                document.getElementById(
+                    "newPassword"
+                ).value;
 
-    let confirmPassword =
-        document.getElementById(
-            "confirmPassword"
-        ).value;
+            const confirmPassword =
+                document.getElementById(
+                    "confirmPassword"
+                ).value;
 
-    fetch("/reset-password", {
+            if (
+                newPassword !==
+                confirmPassword
+            ) {
 
-        method: "POST",
+                alert(
+                    "Passwords do not match"
+                );
 
-        headers: {
-            "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
+                return;
+            }
 
-        body:
-            `username=${username}` +
-            `&newPassword=${newPassword}` +
-            `&confirmPassword=${confirmPassword}`
-    })
+            try {
 
-    .then(res => res.text())
+                const response =
+                    await fetch(
+                        "/auth/reset-password",
+                        {
 
-    .then(data => {
+                            method: "POST",
 
-        alert(
-            "Password reset successful"
-        );
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
 
-        window.location.href =
-            "/login";
-    });
-});
+                            body: JSON.stringify({
+
+                                username,
+
+                                newPassword
+                            })
+                        });
+
+                const result =
+                    await response.json();
+
+                if (result.success) {
+
+                    alert(
+                        "Password reset successful"
+                    );
+
+                    window.location.href =
+                        "/login";
+
+                } else {
+
+                    alert(result.error);
+                }
+
+            } catch (error) {
+
+                alert("Server error");
+            }
+        });

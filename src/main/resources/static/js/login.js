@@ -1,43 +1,55 @@
 document
-.getElementById("loginForm")
+    .getElementById("loginForm")
+    .addEventListener("submit", async (e) => {
 
-.addEventListener("submit", function(e){
+        e.preventDefault();
 
-    e.preventDefault();
+        const username =
+            document.getElementById("username").value;
 
-    let username =
-        document.getElementById("username").value;
+        const password =
+            document.getElementById("password").value;
 
-    let password =
-        document.getElementById("password").value;
+        try {
 
-    fetch(
-        `/login?username=${username}&password=${password}`,
-        {
-            method: "POST"
-        }
-    )
+            const response =
+                await fetch("/auth/login", {
 
-    .then(res => res.text())
+                    method: "POST",
 
-    .then(data => {
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-        if(data.includes("dashboard")){
+                    body: JSON.stringify({
+                        username,
+                        password
+                    })
+                });
 
-            localStorage.setItem(
-                "username",
-                username
-            );
+            const result =
+                await response.json();
 
-            window.location.href =
-                "/dashboard";
-        }
+            if (result.success) {
 
-        else{
+                localStorage.setItem(
+                    "username",
+                    username
+                );
 
-            alert(
-                "User does not exist or password is incorrect"
-            );
+                alert("Login successful");
+
+                window.location.href =
+                    "/dashboard";
+
+            } else {
+
+                alert(result.error);
+            }
+
+        } catch (error) {
+
+            alert("Server error");
         }
     });
-});

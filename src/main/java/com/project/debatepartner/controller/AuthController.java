@@ -4,162 +4,178 @@ import com.project.debatepartner.model.User;
 import com.project.debatepartner.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@RestController
+@RequestMapping("/auth")
+@CrossOrigin("*")
 public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
 
-    // =========================
-    // LOGIN
-    // =========================
+    // ================= LOGIN =================
+
     @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password) {
+    public Map<String, Object> login(
+            @RequestBody User loginUser) {
 
-        User user = userRepository
-                .findByUsername(username)
-                .orElse(null);
+        Map<String, Object> response =
+                new HashMap<>();
 
-        // USER NOT FOUND
-        if(user == null){
-            return "redirect:/login?error=user";
+        User user =
+                userRepository.findByUsername(
+                        loginUser.getUsername()
+                );
+
+        if (user == null) {
+
+            response.put("success", false);
+
+            response.put(
+                    "error",
+                    "User not found"
+            );
+
+            return response;
         }
 
-        // WRONG PASSWORD
-        if(!user.getPassword().equals(password)){
-            return "redirect:/login?error=password";
+        if (!user.getPassword().equals(
+                loginUser.getPassword())) {
+
+            response.put("success", false);
+
+            response.put(
+                    "error",
+                    "Wrong password"
+            );
+
+            return response;
         }
 
-        // SUCCESS
-        return "redirect:/dashboard";
+        response.put("success", true);
+
+        return response;
     }
 
-    // =========================
-    // SIGNUP
-    // =========================
-    @PostMapping("/signup")
-    @ResponseBody
-    public Map<String, Object> signup(@RequestParam String fullName,
-                                      @RequestParam String email,
-                                      @RequestParam String username,
-                                      @RequestParam String password,
-                                      @RequestParam String confirmPassword,
-                                      @RequestParam("securityQ") String securityQuestion,
-                                      @RequestParam String answer) {
+    // ================= GET QUESTION =================
 
-        // PASSWORD CHECK
-        if (!password.equals(confirmPassword)) {
-            return Map.of("success", false, "error", "password");
-        }
-
-        // USERNAME EXISTS
-        if (userRepository.findByUsername(username).isPresent()) {
-            return Map.of("success", false, "error", "username");
-        }
-
-        // EMAIL EXISTS
-        if (userRepository.findByEmail(email).isPresent()) {
-            return Map.of("success", false, "error", "email");
-        }
-
-        // CREATE USER
-        User user = new User();
-
-        user.setFullName(fullName);
-        user.setEmail(email);
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setSecurityQuestion(securityQuestion);
-        user.setAnswer(answer);
-
-        userRepository.save(user);
-
-        // SUCCESS
-        return Map.of("success", true);
-    }
-
-    // =========================
-    // GET SECURITY QUESTION
-    // =========================
     @GetMapping("/get-question")
-    @ResponseBody
-    public String getQuestion(@RequestParam String username) {
+    public Map<String, Object> getQuestion(
+            @RequestParam String username) {
 
-        User user = userRepository
-                .findByUsername(username)
-                .orElse(null);
+        Map<String, Object> response =
+                new HashMap<>();
+
+        User user =
+                userRepository.findByUsername(
+                        username
+                );
 
         if (user == null) {
-            return "NOT_FOUND";
+
+            response.put("success", false);
+
+            response.put(
+                    "error",
+                    "User not found"
+            );
+
+            return response;
         }
 
-        return user.getSecurityQuestion();
+        response.put("success", true);
+
+        response.put(
+                "question",
+                user.getSecurityQuestion()
+        );
+
+        return response;
     }
 
-    // =========================
-    // VERIFY ANSWER
-    // =========================
+    // ================= VERIFY ANSWER =================
+
     @PostMapping("/verify-answer")
-    @ResponseBody
-    public String verifyAnswer(
-            @RequestBody Map<String, String> body) {
+    public Map<String, Object> verifyAnswer(
+            @RequestBody Map<String, String> data) {
 
-        String username = body.get("username");
-        String question = body.get("question");
-        String answer = body.get("answer");
+        Map<String, Object> response =
+                new HashMap<>();
 
-        User user = userRepository
-                .findByUsername(username)
-                .orElse(null);
+        User user =
+                userRepository.findByUsername(
+                        data.get("username")
+                );
 
         if (user == null) {
-            return "INVALID";
+
+            response.put("success", false);
+
+            response.put(
+                    "error",
+                    "User not found"
+            );
+
+            return response;
         }
 
-        if (user.getSecurityQuestion().equals(question)
-                && user.getAnswer().equalsIgnoreCase(answer)) {
+        if (!user.getSecurityAnswer()
+                .equalsIgnoreCase(
+                        data.get("answer"))) {
 
-            return "VALID";
+            response.put("success", false);
+
+            response.put(
+                    "error",
+                    "Wrong answer"
+            );
+
+            return response;
         }
 
-        return "INVALID";
+        response.put("success", true);
+
+        return response;
     }
 
-    // =========================
-    // RESET PASSWORD
-    // =========================
+    // ================= RESET PASSWORD =================
+
     @PostMapping("/reset-password")
-    public String resetPassword(
-            @RequestParam String username,
-            @RequestParam String newPassword,
-            @RequestParam String confirmPassword) {
+    public Map<String, Object> resetPassword(
+            @RequestBody Map<String, String> data) {
 
-        // PASSWORD MATCH CHECK
-        if (!newPassword.equals(confirmPassword)) {
-            return "redirect:/forget?error=password";
-        }
+        Map<String, Object> response =
+                new HashMap<>();
 
-        User user = userRepository
-                .findByUsername(username)
-                .orElse(null);
+        User user =
+                userRepository.findByUsername(
+                        data.get("username")
+                );
 
-        // USER NOT FOUND
         if (user == null) {
-            return "redirect:/forget?error=user";
+
+            response.put("success", false);
+
+            response.put(
+                    "error",
+                    "User not found"
+            );
+
+            return response;
         }
 
-        // UPDATE PASSWORD
-        user.setPassword(newPassword);
+        user.setPassword(
+                data.get("newPassword")
+        );
 
         userRepository.save(user);
 
-        // SUCCESS
-        return "redirect:/login?success=reset";
+        response.put("success", true);
+
+        return response;
     }
 }
