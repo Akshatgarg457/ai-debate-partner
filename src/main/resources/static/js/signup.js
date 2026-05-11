@@ -35,21 +35,24 @@ document
             "application/x-www-form-urlencoded"
         },
 
-        body:
-            `fullName=${fullName}` +
-            `&email=${email}` +
-            `&username=${username}` +
-            `&password=${password}` +
-            `&confirmPassword=${confirmPassword}` +
-            `&securityQ=${securityQ}` +
-            `&answer=${answer}`
+        body: (() => {
+            const params = new URLSearchParams();
+            params.append('fullName', fullName);
+            params.append('email', email);
+            params.append('username', username);
+            params.append('password', password);
+            params.append('confirmPassword', confirmPassword);
+            params.append('securityQ', securityQ);
+            params.append('answer', answer);
+            return params.toString();
+        })()
     })
 
-    .then(res => res.text())
+    .then(res => res.json())
 
     .then(data => {
 
-        if(data.includes("login")){
+        if(data.success){
 
             alert(
                 "Account created successfully"
@@ -57,6 +60,27 @@ document
 
             window.location.href =
                 "/login";
+        }
+
+        else if(data.error === "password"){
+
+            alert(
+                "Passwords do not match"
+            );
+        }
+
+        else if(data.error === "username"){
+
+            alert(
+                "Username already exists"
+            );
+        }
+
+        else if(data.error === "email"){
+
+            alert(
+                "Email already in use"
+            );
         }
 
         else{

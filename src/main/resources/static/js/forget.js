@@ -1,40 +1,159 @@
-document
-    .getElementById("forgetForm")
-    .addEventListener("submit", async (e) => {
+const questions = {
 
-        e.preventDefault();
+    anime:
+    "Your School Name",
 
-        const username =
-            document.getElementById("username").value;
+    superhero:
+    "Your Favorite Superhero",
 
-        const newPassword =
-            document.getElementById("newPassword").value;
+    cricketer:
+    "Your Favorite Cricketer",
 
-        const response =
-            await fetch("/auth/reset-password", {
+    lucky:
+    "Your Lucky Number",
 
-                method: "POST",
+    nickname:
+    "Your Childhood Nickname"
+};
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+let currentUser = "";
+let currentQuestion = "";
 
-                body: JSON.stringify({
-                    username,
-                    newPassword
-                })
-            });
+// SEARCH USER
+function searchUser(){
 
-        const result = await response.json();
+    let user =
+        document.getElementById("username").value;
 
-        if (result.success) {
+    fetch("/get-question?username=" + user)
 
-            alert("Password updated");
+    .then(res => res.text())
 
-            window.location.href = "/login";
+    .then(data => {
 
-        } else {
+        if(data === "NOT_FOUND"){
 
-            alert(result.error);
+            alert("User not found");
+
+            return;
+        }
+
+        currentUser = user;
+
+        currentQuestion = data;
+
+        document.getElementById(
+            "question"
+        ).style.display = "block";
+
+        document.getElementById(
+            "answer"
+        ).style.display = "block";
+
+        document.getElementById(
+            "verifyBtn"
+        ).style.display = "block";
+
+        document.getElementById(
+            "question"
+        ).value = questions[data];
+    });
+}
+
+// VERIFY
+function verifyAnswer(){
+
+    let answer =
+        document.getElementById("answer").value;
+
+    fetch("/verify-answer", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+
+            username: currentUser,
+
+            question: currentQuestion,
+
+            answer: answer
+        })
+    })
+
+    .then(res => res.text())
+
+    .then(data => {
+
+        if(data === "VALID"){
+
+            document.getElementById(
+                "resetForm"
+            ).style.display = "block";
+
+            document.getElementById(
+                "hiddenUsername"
+            ).value = currentUser;
+        }
+
+        else{
+
+            alert("Wrong answer");
         }
     });
+}
+
+// RESET PASSWORD
+document
+.getElementById("resetForm")
+
+.addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    let username =
+        document.getElementById(
+            "hiddenUsername"
+        ).value;
+
+    let newPassword =
+        document.getElementById(
+            "newPassword"
+        ).value;
+
+    let confirmPassword =
+        document.getElementById(
+            "confirmPassword"
+        ).value;
+
+    fetch("/reset-password", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+            `username=${username}` +
+            `&newPassword=${newPassword}` +
+            `&confirmPassword=${confirmPassword}`
+    })
+
+    .then(res => res.text())
+
+    .then(data => {
+
+        alert(
+            "Password reset successful"
+        );
+
+        window.location.href =
+            "/login";
+    });
+});
