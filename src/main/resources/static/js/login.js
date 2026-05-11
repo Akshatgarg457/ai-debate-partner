@@ -11,18 +11,25 @@ document
     let password =
         document.getElementById("password").value;
 
-    fetch(
-        `/login?username=${username}&password=${password}`,
-        {
-            method: "POST"
-        }
-    )
+    fetch("/login", {
 
-    .then(res => res.text())
+        method: "POST",
+
+        headers: {
+            "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:
+            `username=${encodeURIComponent(username)}` +
+            `&password=${encodeURIComponent(password)}`
+    })
+
+    .then(res => res.json())
 
     .then(data => {
 
-        if(data.includes("dashboard")){
+        if(data.success){
 
             localStorage.setItem(
                 "username",
@@ -33,10 +40,24 @@ document
                 "/dashboard";
         }
 
+        else if(data.error === "user"){
+
+            alert(
+                "User does not exist"
+            );
+        }
+
+        else if(data.error === "password"){
+
+            alert(
+                "Incorrect password"
+            );
+        }
+
         else{
 
             alert(
-                "User does not exist or password is incorrect"
+                "Login failed"
             );
         }
     });
