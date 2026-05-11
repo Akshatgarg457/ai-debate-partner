@@ -1,119 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- SPRING BOOT PARENT -->
     <parent>
-
         <groupId>org.springframework.boot</groupId>
-
         <artifactId>spring-boot-starter-parent</artifactId>
-
-        <version>3.3.5</version>
-
+        <version>3.3.2</version>
         <relativePath/>
-
     </parent>
 
+    <!-- PROJECT DETAILS -->
     <groupId>com.project</groupId>
-
     <artifactId>debatepartner</artifactId>
-
     <version>0.0.1-SNAPSHOT</version>
+    <name>AI Debate Partner</name>
+    <description>AI Voice Debate Partner Project</description>
 
+    <!-- JAVA VERSION -->
     <properties>
-
         <java.version>17</java.version>
-
     </properties>
 
+    <!-- DEPENDENCIES -->
     <dependencies>
 
-        <!-- WEB -->
+        <!-- SPRING WEB -->
         <dependency>
-
             <groupId>org.springframework.boot</groupId>
-
             <artifactId>spring-boot-starter-web</artifactId>
-
         </dependency>
 
         <!-- THYMELEAF -->
         <dependency>
-
             <groupId>org.springframework.boot</groupId>
-
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
-
-        </dependency>
-
-        <!-- WEBSOCKET -->
-        <dependency>
-
-            <groupId>org.springframework.boot</groupId>
-
-            <artifactId>spring-boot-starter-websocket</artifactId>
-
         </dependency>
 
         <!-- JPA -->
         <dependency>
-
             <groupId>org.springframework.boot</groupId>
-
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-
         </dependency>
 
-        <!-- MYSQL -->
+        <!-- H2 DATABASE -->
         <dependency>
-
-            <groupId>com.mysql</groupId>
-
-            <artifactId>mysql-connector-j</artifactId>
-
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency>
 
+        <!-- JACKSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <!-- LOMBOK -->
         <dependency>
-
             <groupId>org.projectlombok</groupId>
-
             <artifactId>lombok</artifactId>
-
             <optional>true</optional>
+        </dependency>
 
+        <!-- DEVTOOLS -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- TEST -->
         <dependency>
-
             <groupId>org.springframework.boot</groupId>
-
             <artifactId>spring-boot-starter-test</artifactId>
-
             <scope>test</scope>
-
         </dependency>
 
     </dependencies>
 
+    <!-- BUILD -->
     <build>
 
         <plugins>
 
+            <!-- SPRING BOOT MAVEN -->
             <plugin>
-
                 <groupId>org.springframework.boot</groupId>
-
                 <artifactId>spring-boot-maven-plugin</artifactId>
-
             </plugin>
 
         </plugins>
