@@ -140,20 +140,44 @@ document
         },
 
         body:
-            `username=${username}` +
-            `&newPassword=${newPassword}` +
-            `&confirmPassword=${confirmPassword}`
+            `username=${encodeURIComponent(username)}` +
+            `&newPassword=${encodeURIComponent(newPassword)}` +
+            `&confirmPassword=${encodeURIComponent(confirmPassword)}`
     })
 
-    .then(res => res.text())
+    .then(res => res.json())
 
     .then(data => {
 
-        alert(
-            "Password reset successful"
-        );
+        if(data.success){
 
-        window.location.href =
-            "/login";
+            alert(
+                "Password reset successful"
+            );
+
+            window.location.href =
+                "/login";
+        }
+
+        else if(data.error === "password"){
+
+            alert(
+                "Passwords do not match"
+            );
+        }
+
+        else if(data.error === "user"){
+
+            alert(
+                "User not found"
+            );
+        }
+
+        else{
+
+            alert(
+                "Password reset failed"
+            );
+        }
     });
 });

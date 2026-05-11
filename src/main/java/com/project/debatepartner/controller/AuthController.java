@@ -19,8 +19,9 @@ public class AuthController {
     // LOGIN
     // =========================
     @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password) {
+    @ResponseBody
+    public Map<String, Object> login(@RequestParam String username,
+                                     @RequestParam String password) {
 
         User user = userRepository
                 .findByUsername(username)
@@ -28,16 +29,16 @@ public class AuthController {
 
         // USER NOT FOUND
         if(user == null){
-            return "redirect:/login?error=user";
+            return Map.of("success", false, "error", "user");
         }
 
         // WRONG PASSWORD
         if(!user.getPassword().equals(password)){
-            return "redirect:/login?error=password";
+            return Map.of("success", false, "error", "password");
         }
 
         // SUCCESS
-        return "redirect:/dashboard";
+        return Map.of("success", true);
     }
 
     // =========================
@@ -135,14 +136,15 @@ public class AuthController {
     // RESET PASSWORD
     // =========================
     @PostMapping("/reset-password")
-    public String resetPassword(
+    @ResponseBody
+    public Map<String, Object> resetPassword(
             @RequestParam String username,
             @RequestParam String newPassword,
             @RequestParam String confirmPassword) {
 
         // PASSWORD MATCH CHECK
         if (!newPassword.equals(confirmPassword)) {
-            return "redirect:/forget?error=password";
+            return Map.of("success", false, "error", "password");
         }
 
         User user = userRepository
@@ -151,7 +153,7 @@ public class AuthController {
 
         // USER NOT FOUND
         if (user == null) {
-            return "redirect:/forget?error=user";
+            return Map.of("success", false, "error", "user");
         }
 
         // UPDATE PASSWORD
@@ -160,6 +162,6 @@ public class AuthController {
         userRepository.save(user);
 
         // SUCCESS
-        return "redirect:/login?success=reset";
+        return Map.of("success", true);
     }
 }
