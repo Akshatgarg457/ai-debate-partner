@@ -5,7 +5,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- SPRING BOOT PARENT -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -13,22 +12,19 @@
         <relativePath/>
     </parent>
 
-    <!-- PROJECT DETAILS -->
     <groupId>com.project</groupId>
     <artifactId>debatepartner</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>AI Debate Partner</name>
-    <description>AI Voice Debate Partner Project</description>
 
-    <!-- JAVA VERSION -->
+    <name>debatepartner</name>
+
     <properties>
         <java.version>17</java.version>
     </properties>
 
-    <!-- DEPENDENCIES -->
     <dependencies>
 
-        <!-- SPRING WEB -->
+        <!-- WEB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -46,7 +42,7 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- H2 DATABASE -->
+        <!-- H2 -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -66,14 +62,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- DEVTOOLS -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-
         <!-- TEST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -83,19 +71,15 @@
 
     </dependencies>
 
-    <!-- BUILD -->
     <build>
-
         <plugins>
 
-            <!-- SPRING BOOT MAVEN -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
         </plugins>
-
     </build>
 
 </project>
