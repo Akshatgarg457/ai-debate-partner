@@ -35,14 +35,17 @@ document
             "application/x-www-form-urlencoded"
         },
 
-        body:
-            `fullName=${fullName}` +
-            `&email=${email}` +
-            `&username=${username}` +
-            `&password=${password}` +
-            `&confirmPassword=${confirmPassword}` +
-            `&securityQ=${securityQ}` +
-            `&answer=${answer}`
+        body: (() => {
+            const params = new URLSearchParams();
+            params.append('fullName', fullName);
+            params.append('email', email);
+            params.append('username', username);
+            params.append('password', password);
+            params.append('confirmPassword', confirmPassword);
+            params.append('securityQ', securityQ);
+            params.append('answer', answer);
+            return params.toString();
+        })()
     })
 
     .then(res => res.text())
