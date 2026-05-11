@@ -21,40 +21,64 @@ public class AuthController {
 
     @PostMapping("/login")
     public Map<String, Object> login(
-            @RequestBody User loginUser) {
+            @RequestBody Map<String, String> data) {
 
         Map<String, Object> response =
                 new HashMap<>();
 
+        String username =
+                data.get("username");
+
+        String password =
+                data.get("password");
+
         User user =
-                userRepository.findByUsername(
-                        loginUser.getUsername()
-                );
+                userRepository.findByUsername(username);
 
         if (user == null) {
 
             response.put("success", false);
-
-            response.put(
-                    "error",
-                    "User not found"
-            );
+            response.put("error", "User not found");
 
             return response;
         }
 
-        if (!user.getPassword().equals(
-                loginUser.getPassword())) {
+        if (!user.getPassword().equals(password)) {
 
             response.put("success", false);
-
-            response.put(
-                    "error",
-                    "Wrong password"
-            );
+            response.put("error", "Wrong password");
 
             return response;
         }
+
+        response.put("success", true);
+
+        return response;
+    }
+
+    // ================= SIGNUP =================
+
+    @PostMapping("/signup")
+    public Map<String, Object> signup(
+            @RequestBody User user) {
+
+        Map<String, Object> response =
+                new HashMap<>();
+
+        User existingUser =
+                userRepository.findByUsername(
+                        user.getUsername()
+                );
+
+        if (existingUser != null) {
+
+            response.put("success", false);
+            response.put("error", "Username already exists");
+
+            return response;
+        }
+
+        userRepository.save(user);
 
         response.put("success", true);
 
@@ -71,18 +95,12 @@ public class AuthController {
                 new HashMap<>();
 
         User user =
-                userRepository.findByUsername(
-                        username
-                );
+                userRepository.findByUsername(username);
 
         if (user == null) {
 
             response.put("success", false);
-
-            response.put(
-                    "error",
-                    "User not found"
-            );
+            response.put("error", "User not found");
 
             return response;
         }
@@ -114,25 +132,19 @@ public class AuthController {
         if (user == null) {
 
             response.put("success", false);
-
-            response.put(
-                    "error",
-                    "User not found"
-            );
+            response.put("error", "User not found");
 
             return response;
         }
 
+        String answer =
+                data.get("answer");
+
         if (!user.getSecurityAnswer()
-                .equalsIgnoreCase(
-                        data.get("answer"))) {
+                .equalsIgnoreCase(answer)) {
 
             response.put("success", false);
-
-            response.put(
-                    "error",
-                    "Wrong answer"
-            );
+            response.put("error", "Wrong answer");
 
             return response;
         }
@@ -159,11 +171,7 @@ public class AuthController {
         if (user == null) {
 
             response.put("success", false);
-
-            response.put(
-                    "error",
-                    "User not found"
-            );
+            response.put("error", "User not found");
 
             return response;
         }
