@@ -44,27 +44,28 @@ public class AuthController {
     // SIGNUP
     // =========================
     @PostMapping("/signup")
-    public String signup(@RequestParam String fullName,
-                         @RequestParam String email,
-                         @RequestParam String username,
-                         @RequestParam String password,
-                         @RequestParam String confirmPassword,
-                         @RequestParam("securityQ") String securityQuestion,
-                         @RequestParam String answer) {
+    @ResponseBody
+    public Map<String, Object> signup(@RequestParam String fullName,
+                                      @RequestParam String email,
+                                      @RequestParam String username,
+                                      @RequestParam String password,
+                                      @RequestParam String confirmPassword,
+                                      @RequestParam("securityQ") String securityQuestion,
+                                      @RequestParam String answer) {
 
         // PASSWORD CHECK
         if (!password.equals(confirmPassword)) {
-            return "redirect:/signup?error=password";
+            return Map.of("success", false, "error", "password");
         }
 
         // USERNAME EXISTS
         if (userRepository.findByUsername(username).isPresent()) {
-            return "redirect:/signup?error=username";
+            return Map.of("success", false, "error", "username");
         }
 
         // EMAIL EXISTS
         if (userRepository.findByEmail(email).isPresent()) {
-            return "redirect:/signup?error=email";
+            return Map.of("success", false, "error", "email");
         }
 
         // CREATE USER
@@ -80,7 +81,7 @@ public class AuthController {
         userRepository.save(user);
 
         // SUCCESS
-        return "redirect:/login?success=signup";
+        return Map.of("success", true);
     }
 
     // =========================

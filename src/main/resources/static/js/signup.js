@@ -48,11 +48,11 @@ document
         })()
     })
 
-    .then(res => res.text())
+    .then(res => res.json())
 
     .then(data => {
 
-        if(data.includes("login")){
+        if(data.success){
 
             alert(
                 "Account created successfully"
@@ -60,6 +60,27 @@ document
 
             window.location.href =
                 "/login";
+        }
+
+        else if(data.error === "password"){
+
+            alert(
+                "Passwords do not match"
+            );
+        }
+
+        else if(data.error === "username"){
+
+            alert(
+                "Username already exists"
+            );
+        }
+
+        else if(data.error === "email"){
+
+            alert(
+                "Email already in use"
+            );
         }
 
         else{
