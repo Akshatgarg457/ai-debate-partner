@@ -16,6 +16,8 @@ public class User {
 
     private String password;
 
+    private String fullName;
+
     @Column(name = "security_question")
     private String securityQuestion;
 
@@ -38,6 +40,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getFullName() {
+        return fullName;
     }
 
     public String getSecurityQuestion() {
@@ -64,6 +70,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public void setSecurityQuestion(String securityQuestion) {
