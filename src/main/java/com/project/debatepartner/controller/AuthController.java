@@ -60,14 +60,42 @@ public class AuthController {
 
     @PostMapping("/signup")
     public Map<String, Object> signup(
-            @RequestBody User user) {
+            @RequestBody Map<String, String> data) {
 
         Map<String, Object> response =
                 new HashMap<>();
 
+        String password =
+                data.get("password");
+
+        String confirmPassword =
+                data.get("confirmPassword");
+
+        if (!password.equals(confirmPassword)) {
+
+            response.put("success", false);
+            response.put("error", "Passwords do not match");
+
+            return response;
+        }
+
+        String email =
+                data.get("email");
+
+        User existingEmail =
+                userRepository.findByEmail(email);
+
+        if (existingEmail != null) {
+
+            response.put("success", false);
+            response.put("error", "Email already in use");
+
+            return response;
+        }
+
         User existingUser =
                 userRepository.findByUsername(
-                        user.getUsername()
+                        data.get("username")
                 );
 
         if (existingUser != null) {
@@ -77,6 +105,14 @@ public class AuthController {
 
             return response;
         }
+
+        User user = new User();
+        user.setFullName(data.get("fullName"));
+        user.setUsername(data.get("username"));
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setSecurityQuestion(data.get("securityQuestion"));
+        user.setSecurityAnswer(data.get("securityAnswer"));
 
         userRepository.save(user);
 
