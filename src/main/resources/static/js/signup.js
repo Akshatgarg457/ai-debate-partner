@@ -26,26 +26,23 @@ document
     let answer =
         document.getElementById("answer").value;
 
-    fetch("/signup", {
+    fetch("/auth/signup", {
 
         method: "POST",
 
         headers: {
-            "Content-Type":
-            "application/x-www-form-urlencoded"
+            "Content-Type": "application/json"
         },
 
-        body: (() => {
-            const params = new URLSearchParams();
-            params.append('fullName', fullName);
-            params.append('email', email);
-            params.append('username', username);
-            params.append('password', password);
-            params.append('confirmPassword', confirmPassword);
-            params.append('securityQ', securityQ);
-            params.append('answer', answer);
-            return params.toString();
-        })()
+        body: JSON.stringify({
+            fullName,
+            email,
+            username,
+            password,
+            confirmPassword,
+            securityQ,
+            answer
+        })
     })
 
     .then(res => res.json())
