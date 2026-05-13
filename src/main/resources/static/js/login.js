@@ -39,3 +39,8 @@ async function login() {
         alert(data.error);
     }
 }
+
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    login();
+});
