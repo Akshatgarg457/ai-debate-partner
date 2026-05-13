@@ -6,16 +6,19 @@ async function searchUser() {
         document.getElementById("username").value;
 
     const response =
-        await fetch(`/auth/question?username=${currentUsername}`);
+        await fetch(`/auth/get-question?username=${currentUsername}`);
 
     const data =
         await response.json();
 
-    if(data.success){
+    if (data.success) {
 
-        document.getElementById(
-            "question"
-        ).value = data.question;
+        document.getElementById("question").style.display = "block";
+        document.getElementById("answer").style.display = "block";
+        document.getElementById("verifyBtn").style.display = "block";
+
+        document.getElementById("question").value =
+            data.question;
 
     } else {
 
@@ -29,76 +32,81 @@ async function verifyAnswer() {
         document.getElementById("answer").value;
 
     const response =
-        await fetch("/auth/verify", {
+        await fetch("/auth/verify-answer", {
 
-        method: "POST",
+            method: "POST",
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-        body: JSON.stringify({
+            body: JSON.stringify({
 
-            username: currentUsername,
-            answer
-        })
-    });
+                username: currentUsername,
+                answer: answer
+            })
+        });
 
     const data =
         await response.json();
 
-    if(data.success){
+    if (data.success) {
 
         alert("Answer verified");
 
+        document.getElementById("resetForm").style.display =
+            "block";
+
     } else {
 
         alert(data.error);
     }
 }
 
-async function resetPassword() {
+document.getElementById("resetForm")
+    .addEventListener("submit", async function (e) {
 
-    const password =
-        document.getElementById("password").value;
+        e.preventDefault();
 
-    const confirmPassword =
-        document.getElementById("confirmPassword").value;
+        const newPassword =
+            document.getElementById("newPassword").value;
 
-    if(password !== confirmPassword){
+        const confirmPassword =
+            document.getElementById("confirmPassword").value;
 
-        alert("Passwords do not match");
-        return;
-    }
+        if (newPassword !== confirmPassword) {
 
-    const response =
-        await fetch("/auth/reset", {
+            alert("Passwords do not match");
+            return;
+        }
 
-        method: "POST",
+        const response =
+            await fetch("/auth/reset-password", {
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+                method: "POST",
 
-        body: JSON.stringify({
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-            username: currentUsername,
-            password
-        })
+                body: JSON.stringify({
+
+                    username: currentUsername,
+                    newPassword: newPassword
+                })
+            });
+
+        const data =
+            await response.json();
+
+        if (data.success) {
+
+            alert("Password reset successful");
+
+            window.location.href = "/login";
+
+        } else {
+
+            alert(data.error);
+        }
     });
-
-    const data =
-        await response.json();
-
-    if(data.success){
-
-        alert("Password reset successful");
-
-        window.location.href =
-            "/login";
-
-    } else {
-
-        alert(data.error);
-    }
-}
