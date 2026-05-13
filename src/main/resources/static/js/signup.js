@@ -1,7 +1,7 @@
 document
 .getElementById("signupForm")
 
-.addEventListener("submit", function(e){
+.addEventListener("submit", async function(e){
 
     e.preventDefault();
 
@@ -20,34 +20,37 @@ document
     let confirmPassword =
         document.getElementById("confirmPassword").value;
 
-    let securityQ =
+    let securityQuestion =
         document.getElementById("securityQ").value;
 
-    let answer =
+    let securityAnswer =
         document.getElementById("answer").value;
 
-    fetch("/auth/signup", {
+    try {
 
-        method: "POST",
+        const response =
+            await fetch("/auth/signup", {
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+                method: "POST",
 
-        body: JSON.stringify({
-            fullName,
-            email,
-            username,
-            password,
-            confirmPassword,
-            securityQ,
-            answer
-        })
-    })
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-    .then(res => res.json())
+                body: JSON.stringify({
 
-    .then(data => {
+                    fullName,
+                    email,
+                    username,
+                    password,
+                    confirmPassword,
+                    securityQuestion,
+                    securityAnswer
+                })
+            });
+
+        const data =
+            await response.json();
 
         if(data.success){
 
@@ -59,32 +62,15 @@ document
                 "/login";
         }
 
-        else if(data.error === "password"){
-
-            alert(
-                "Passwords do not match"
-            );
-        }
-
-        else if(data.error === "username"){
-
-            alert(
-                "Username already exists"
-            );
-        }
-
-        else if(data.error === "email"){
-
-            alert(
-                "Email already in use"
-            );
-        }
-
         else{
 
-            alert(
-                "Signup failed"
-            );
+            alert(data.error);
         }
-    });
+
+    } catch(error){
+
+        console.error(error);
+
+        alert("Signup failed");
+    }
 });
