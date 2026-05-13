@@ -3,79 +3,95 @@
 
 <head>
 
-<meta charset="UTF-8">
-<title>Forgot Password</title>
+    <meta charset="UTF-8">
 
-<link rel="stylesheet"
-href="/css/forget.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Forgot Password</title>
+
+    <link rel="stylesheet"
+          href="/css/forget.css">
 
 </head>
 
 <body>
 
 <div class="box">
-<div class="login">
-<div class="loginBx">
 
-<h2>FORGOT PASSWORD</h2>
+    <div class="login">
 
-<input type="text"
-id="username"
-placeholder="Enter Username">
+        <div class="loginBx">
 
-<input type="button"
-value="Search"
-onclick="searchUser()">
+            <h2>FORGOT PASSWORD</h2>
 
-<input type="text"
-id="question"
-readonly
-style="display:none;">
+            <!-- USERNAME -->
 
-<input type="text"
-id="answer"
-placeholder="Answer"
-style="display:none;">
+            <input type="text"
+                   id="username"
+                   placeholder="Enter Username">
 
-<input type="button"
-id="verifyBtn"
-value="Verify"
-onclick="verifyAnswer()"
-style="display:none;">
+            <input type="button"
+                   value="Search"
+                   onclick="searchUser()">
 
-<form id="resetForm"
-style="display:none;">
+            <!-- SECURITY QUESTION -->
 
-<input type="hidden"
-id="hiddenUsername">
+            <input type="text"
+                   id="question"
+                   placeholder="Security Question"
+                   readonly
+                   style="display:none;">
 
-<input type="password"
-id="newPassword"
-placeholder="New Password"
-required>
+            <!-- ANSWER -->
 
-<br><br>
+            <input type="text"
+                   id="answer"
+                   placeholder="Enter Answer"
+                   style="display:none;">
 
-<input type="password"
-id="confirmPassword"
-placeholder="Confirm Password"
-required>
+            <!-- VERIFY BUTTON -->
 
-<input type="submit"
-value="Reset Password">
+            <input type="button"
+                   id="verifyBtn"
+                   value="Verify"
+                   onclick="verifyAnswer()"
+                   style="display:none;">
 
-</form>
+            <!-- RESET PASSWORD FORM -->
 
-<div class="group">
+            <form id="resetForm"
+                  style="display:none;">
 
-<a href="/login">
-Back to Login
-</a>
+                <input type="password"
+                       id="newPassword"
+                       placeholder="New Password"
+                       required>
 
-</div>
+                <br><br>
 
-</div>
-</div>
+                <input type="password"
+                       id="confirmPassword"
+                       placeholder="Confirm Password"
+                       required>
+
+                <input type="submit"
+                       value="Reset Password">
+
+            </form>
+
+            <div class="group">
+
+                <a href="/login">
+                    Back to Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script src="/js/forget.js"></script>

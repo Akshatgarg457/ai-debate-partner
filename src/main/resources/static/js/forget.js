@@ -5,24 +5,48 @@ async function searchUser() {
     currentUsername =
         document.getElementById("username").value;
 
-    const response =
-        await fetch(`/auth/get-question?username=${currentUsername}`);
+    if (!currentUsername) {
 
-    const data =
-        await response.json();
+        alert("Please enter username");
+        return;
+    }
 
-    if (data.success) {
+    try {
 
-        document.getElementById("question").style.display = "block";
-        document.getElementById("answer").style.display = "block";
-        document.getElementById("verifyBtn").style.display = "block";
+        const response =
+            await fetch(`/auth/get-question?username=${currentUsername}`);
 
-        document.getElementById("question").value =
-            data.question;
+        const data =
+            await response.json();
 
-    } else {
+        console.log(data);
 
-        alert(data.error);
+        if (data.success) {
+
+            const questionField =
+                document.getElementById("question");
+
+            questionField.style.display = "block";
+
+            questionField.value =
+                data.question;
+
+            document.getElementById("answer").style.display =
+                "block";
+
+            document.getElementById("verifyBtn").style.display =
+                "block";
+
+        } else {
+
+            alert(data.error);
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Server error");
     }
 }
 
@@ -31,35 +55,50 @@ async function verifyAnswer() {
     const answer =
         document.getElementById("answer").value;
 
-    const response =
-        await fetch("/auth/verify-answer", {
+    if (!answer) {
 
-            method: "POST",
+        alert("Please enter answer");
+        return;
+    }
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+    try {
 
-            body: JSON.stringify({
+        const response =
+            await fetch("/auth/verify-answer", {
 
-                username: currentUsername,
-                answer: answer
-            })
-        });
+                method: "POST",
 
-    const data =
-        await response.json();
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-    if (data.success) {
+                body: JSON.stringify({
 
-        alert("Answer verified");
+                    username: currentUsername,
+                    answer: answer
+                })
+            });
 
-        document.getElementById("resetForm").style.display =
-            "block";
+        const data =
+            await response.json();
 
-    } else {
+        if (data.success) {
 
-        alert(data.error);
+            alert("Answer verified");
+
+            document.getElementById("resetForm").style.display =
+                "block";
+
+        } else {
+
+            alert(data.error);
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Server error");
     }
 }
 
@@ -74,39 +113,55 @@ document.getElementById("resetForm")
         const confirmPassword =
             document.getElementById("confirmPassword").value;
 
+        if (!newPassword || !confirmPassword) {
+
+            alert("Please fill all fields");
+            return;
+        }
+
         if (newPassword !== confirmPassword) {
 
             alert("Passwords do not match");
             return;
         }
 
-        const response =
-            await fetch("/auth/reset-password", {
+        try {
 
-                method: "POST",
+            const response =
+                await fetch("/auth/reset-password", {
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                    method: "POST",
 
-                body: JSON.stringify({
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-                    username: currentUsername,
-                    newPassword: newPassword
-                })
-            });
+                    body: JSON.stringify({
 
-        const data =
-            await response.json();
+                        username: currentUsername,
+                        newPassword: newPassword
+                    })
+                });
 
-        if (data.success) {
+            const data =
+                await response.json();
 
-            alert("Password reset successful");
+            if (data.success) {
 
-            window.location.href = "/login";
+                alert("Password reset successful");
 
-        } else {
+                window.location.href =
+                    "/login";
 
-            alert(data.error);
+            } else {
+
+                alert(data.error);
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert("Server error");
         }
     });
