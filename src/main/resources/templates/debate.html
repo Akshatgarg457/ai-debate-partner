@@ -4,7 +4,8 @@
 
     <title>Debate</title>
 
-    <link rel="stylesheet" href="/css/Debate.css">
+    <link rel="stylesheet"
+          href="/css/Debate.css">
 
 </head>
 
@@ -57,34 +58,38 @@
                   placeholder="Type or speak your argument...">
         </textarea>
 
-        <br>
+        <!-- BUTTON GROUP -->
 
-        <!-- SEND -->
+        <div class="button-group">
 
-        <button onclick="sendArgument()"
-                id="sendBtn">
+            <!-- SEND -->
 
-            Send
+            <button onclick="sendArgument()"
+                    id="sendBtn">
 
-        </button>
+                Send
 
-        <!-- VOICE -->
+            </button>
 
-        <button onclick="startVoiceInput()"
-                id="voiceBtn">
+            <!-- VOICE -->
 
-            🎤 Speak
+            <button onclick="startVoiceInput()"
+                    id="voiceBtn">
 
-        </button>
+                🎤 Speak
 
-        <!-- END -->
+            </button>
 
-        <button onclick="endDebate()"
-                class="end-btn">
+            <!-- END -->
 
-            End Debate
+            <button onclick="endDebate()"
+                    class="end-btn">
 
-        </button>
+                End Debate
+
+            </button>
+
+        </div>
 
     </div>
 
