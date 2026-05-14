@@ -3,106 +3,131 @@
 
 <head>
 
-<meta charset="UTF-8">
-<title>Sign Up</title>
+    <meta charset="UTF-8">
 
-<link rel="stylesheet" href="/css/styles.css">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>Sign Up</title>
+
+    <link rel="stylesheet"
+          href="/css/styles.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
 
 <body>
 
 <div class="box">
-<div class="signup">
-<div class="signupBx">
 
-<h2>
-<i class="fa-solid fa-user-plus"></i>
-SIGN UP
-</h2>
+    <div class="signup">
 
-<form id="signupForm">
+        <div class="signupBx">
 
-<input type="text"
-id="fullName"
-placeholder="Full Name"
-required>
+            <h2>
+                <i class="fa-solid fa-user-plus"></i>
+                SIGN UP
+            </h2>
 
-<input type="email"
-id="email"
-placeholder="Email Address"
-required>
+            <form id="signupForm">
 
-<input type="text"
-id="username"
-placeholder="Username"
-required>
+                <!-- FULL NAME -->
 
-<input type="password"
-id="password"
-placeholder="Password"
-required>
+                <input type="text"
+                       id="fullName"
+                       placeholder="Full Name"
+                       required>
 
-<input type="password"
-id="confirmPassword"
-placeholder="Confirm Password"
-required>
+                <!-- EMAIL -->
 
-<select id="securityQ" required>
+                <input type="email"
+                       id="email"
+                       placeholder="Email Address"
+                       required>
 
-<option value="">
-Select Security Question
-</option>
+                <!-- USERNAME -->
 
-<option value="anime">
-Your School Name
-</option>
+                <input type="text"
+                       id="username"
+                       placeholder="Username"
+                       required>
 
-<option value="superhero">
-Your Favorite Superhero
-</option>
+                <!-- PASSWORD -->
 
-<option value="cricketer">
-Your Favorite Cricketer
-</option>
+                <input type="password"
+                       id="password"
+                       placeholder="Password"
+                       required>
 
-<option value="lucky">
-Your Lucky Number
-</option>
+                <!-- CONFIRM PASSWORD -->
 
-<option value="nickname">
-Your Childhood Nickname
-</option>
+                <input type="password"
+                       id="confirmPassword"
+                       placeholder="Confirm Password"
+                       required>
 
-</select>
+                <!-- SECURITY QUESTION -->
 
-<input type="text"
-id="answer"
-placeholder="Your Answer"
-required>
+                <select id="securityQ" required>
 
-<input type="submit"
-value="Create Account">
+                    <option value="">
+                        Select Security Question
+                    </option>
 
-</form>
+                    <option value="What is your school name?">
+                        What is your school name?
+                    </option>
 
-<div class="group">
+                    <option value="Who is your favorite superhero?">
+                        Who is your favorite superhero?
+                    </option>
 
-<a href="/login">
-Already have account?
-</a>
+                    <option value="Who is your favorite cricketer?">
+                        Who is your favorite cricketer?
+                    </option>
 
-<a href="/login">
-Login
-</a>
+                    <option value="What is your lucky number?">
+                        What is your lucky number?
+                    </option>
 
-</div>
+                    <option value="What is your childhood nickname?">
+                        What is your childhood nickname?
+                    </option>
 
-</div>
-</div>
+                </select>
+
+                <!-- ANSWER -->
+
+                <input type="text"
+                       id="answer"
+                       placeholder="Your Answer"
+                       required>
+
+                <!-- SUBMIT -->
+
+                <input type="submit"
+                       value="Create Account">
+
+            </form>
+
+            <div class="group">
+
+                <a href="/login">
+                    Already have account?
+                </a>
+
+                <a href="/login">
+                    Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script src="/js/signup.js"></script>
