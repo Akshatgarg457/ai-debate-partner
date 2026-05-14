@@ -1,3 +1,33 @@
+window.SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+const recognition =
+new webkitSpeechRecognition();
+
+recognition.continuous = false;
+
+recognition.lang = "en-US";
+
+// =========================
+// VOICE INPUT
+// =========================
+
+function startVoice(){
+
+    recognition.start();
+}
+
+recognition.onresult = function(event){
+
+    const speech =
+        event.results[0][0].transcript;
+
+    document.getElementById(
+        "messageInput"
+    ).value = speech;
+};
+
 let params =
     new URLSearchParams(window.location.search);
 
@@ -12,6 +42,7 @@ let stompClient = null;
 // =========================
 // CONNECT
 // =========================
+
 function connect(){
 
     let socket =
@@ -89,6 +120,7 @@ function connect(){
 // =========================
 // CHECK PLAYERS
 // =========================
+
 function checkPlayers(){
 
     fetch(`/human/room/${roomId}`)
@@ -126,6 +158,7 @@ function checkPlayers(){
 // =========================
 // LOAD ROOM
 // =========================
+
 function loadRoom(){
 
     fetch(`/human/room/${roomId}`)
@@ -154,6 +187,7 @@ function loadRoom(){
 // =========================
 // SHOW MESSAGE
 // =========================
+
 function showMessage(msg){
 
     let chatBox =
@@ -175,6 +209,7 @@ function showMessage(msg){
 // =========================
 // SEND MESSAGE
 // =========================
+
 function sendMessage(){
 
     let input =
@@ -204,6 +239,7 @@ function sendMessage(){
 // =========================
 // STATUS
 // =========================
+
 function showStatus(text){
 
     let chatBox =
@@ -224,6 +260,7 @@ function showStatus(text){
 // =========================
 // END DEBATE
 // =========================
+
 function endDebate(){
 
     document.getElementById(
@@ -259,6 +296,7 @@ function endDebate(){
 // =========================
 // LOAD RESULT
 // =========================
+
 function loadDebateResult(){
 
     fetch(`/human/room/${roomId}`)
@@ -277,6 +315,7 @@ function loadDebateResult(){
 // =========================
 // SHOW RESULT
 // =========================
+
 function showResult(room){
 
     // RESULT BOX
@@ -309,6 +348,7 @@ function showResult(room){
 // =========================
 // INIT
 // =========================
+
 connect();
 
 loadRoom();
