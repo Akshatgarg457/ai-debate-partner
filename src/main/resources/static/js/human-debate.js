@@ -279,7 +279,7 @@ function endDebate(){
             alert("Error ending debate");
             return;
         }
-
+//
         // SOCKET EVENT
         stompClient.send(
             "/app/end",
