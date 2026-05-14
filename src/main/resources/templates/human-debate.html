@@ -8,6 +8,7 @@
           href="/css/human-debate.css">
 
     <!-- WebSocket -->
+
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
@@ -16,10 +17,15 @@
 
 <body>
 
+<!-- ========================= -->
 <!-- TOP -->
+<!-- ========================= -->
+
 <div class="top-bar">
 
-    <h2>👥 Human Debate</h2>
+    <h2>
+        👥 Human Debate
+    </h2>
 
     <div class="room-info">
 
@@ -39,7 +45,6 @@
 
 </div>
 
-<!-- WAITING -->
 <div id="waitingBox">
 
     <h2>
@@ -48,7 +53,10 @@
 
 </div>
 
+<!-- ========================= -->
 <!-- MAIN -->
+<!-- ========================= -->
+
 <div id="debateBox"
      style="display:none;">
 
@@ -58,29 +66,39 @@
     </h3>
 
     <!-- CHAT -->
+
     <div id="chatBox"></div>
 
     <!-- INPUT -->
+
     <div class="message-section">
 
         <input
             type="text"
             id="messageInput"
-            placeholder="Type message"
+            placeholder="Type or speak message"
         >
 
+        <!-- SEND -->
+
         <button onclick="sendMessage()">
+
             Send
+
         </button>
 
-        <!-- VOICE BUTTON -->
-        <button onclick="startVoice()">
+        <!-- VOICE -->
+
+        <button id="voiceBtn">
+
             🎤 Speak
+
         </button>
 
     </div>
 
     <!-- END -->
+
     <br>
 
     <button id="endBtn"
@@ -91,15 +109,13 @@
     </button>
 
     <!-- RESULT -->
+
     <div id="resultBox"
          style="display:none;">
 
-        <h2>🏆 Debate Result</h2>
-
-        <h3>
-            Winner:
-            <span id="winnerText"></span>
-        </h3>
+        <h2>
+            🏆 Debate Result
+        </h2>
 
         <div id="resultText"></div>
 
@@ -108,6 +124,193 @@
 </div>
 
 <script src="/js/human-debate.js"></script>
+
+<script>
+
+// =========================
+// VOICE INPUT
+// =========================
+
+const voiceBtn =
+    document.getElementById(
+        "voiceBtn"
+    );
+
+voiceBtn.addEventListener(
+    "click",
+    startVoiceInput
+);
+
+function startVoiceInput(){
+
+    // CHECK SUPPORT
+
+    const SpeechRecognition =
+
+        window.SpeechRecognition
+        || window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+
+        alert(
+            "Voice recognition not supported."
+        );
+
+        return;
+    }
+
+    // CREATE
+
+    const recognition =
+        new SpeechRecognition();
+
+    recognition.lang = "en-US";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+    // BUTTON UI
+
+    voiceBtn.innerText =
+        "🎙 Listening...";
+
+    // START
+
+    recognition.start();
+
+    // RESULT
+
+    recognition.onresult =
+        function(event){
+
+        const transcript =
+
+            event.results[0][0]
+                .transcript;
+
+        // INPUT
+
+        document.getElementById(
+            "messageInput"
+        ).value = transcript;
+
+        // RESET
+
+        voiceBtn.innerText =
+            "🎤 Speak";
+
+        // AUTO SEND
+
+        sendMessage();
+    };
+
+    // ERROR
+
+    recognition.onerror =
+        function(event){
+
+        console.log(
+            event.error
+        );
+
+        voiceBtn.innerText =
+            "🎤 Speak";
+
+        alert(
+            "Voice input failed: "
+            + event.error
+        );
+    };
+
+    // END
+
+    recognition.onend =
+        function(){
+
+        voiceBtn.innerText =
+            "🎤 Speak";
+    };
+}
+
+// =========================
+// VOICE OUTPUT
+// =========================
+
+function speakText(text){
+
+    // STOP OLD
+
+    window.speechSynthesis.cancel();
+
+    const speech =
+
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+    speech.lang = "en-US";
+
+    speech.rate = 1;
+
+    speech.pitch = 1;
+
+    window.speechSynthesis
+        .speak(speech);
+}
+
+// =========================
+// OBSERVE NEW MESSAGES
+// =========================
+
+const observer =
+
+    new MutationObserver(() => {
+
+        const messages =
+
+            document.querySelectorAll(
+                ".message"
+            );
+
+        if(messages.length > 0){
+
+            const lastMessage =
+
+                messages[
+                    messages.length - 1
+                ];
+
+            const text =
+                lastMessage.innerText;
+
+            // SPEAK ONLY OPPONENT
+
+            if(
+                !text.includes(
+                    "You:"
+                )
+            ){
+
+                speakText(text);
+            }
+        }
+    });
+
+// START OBSERVER
+
+observer.observe(
+
+    document.getElementById(
+        "chatBox"
+    ),
+
+    {
+        childList: true
+    }
+);
+
+</script>
 
 </body>
 </html>

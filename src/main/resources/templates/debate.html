@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
+
     <title>Debate</title>
 
-    <link rel="stylesheet"
-          href="/css/Debate.css">
+    <link rel="stylesheet" href="/css/Debate.css">
 
 </head>
 
 <body>
+
+<!-- ========================= -->
+<!-- HEADER -->
+<!-- ========================= -->
 
 <div class="header">
 
@@ -25,29 +29,37 @@
 
 </div>
 
+<!-- ========================= -->
+<!-- MAIN -->
+<!-- ========================= -->
+
 <div class="container">
 
-    <h1>Start Your Debate</h1>
+    <h1>
+        Start Your Debate
+    </h1>
 
     <h2 id="topicTitle">
         Topic: Loading...
     </h2>
 
     <!-- CHAT -->
+
     <div id="chatBox"
          class="chat-box">
-
     </div>
 
     <!-- INPUT -->
+
     <div class="input-section">
 
         <textarea id="argument"
-                  placeholder="Type your argument...">
-
+                  placeholder="Type or speak your argument...">
         </textarea>
 
         <br>
+
+        <!-- SEND -->
 
         <button onclick="sendArgument()"
                 id="sendBtn">
@@ -56,13 +68,16 @@
 
         </button>
 
-        <!-- VOICE BUTTON -->
+        <!-- VOICE -->
 
-        <button onclick="startVoice()">
+        <button onclick="startVoiceInput()"
+                id="voiceBtn">
 
             🎤 Speak
 
         </button>
+
+        <!-- END -->
 
         <button onclick="endDebate()"
                 class="end-btn">
@@ -75,52 +90,49 @@
 
 </div>
 
+<!-- ========================= -->
 <!-- RESULT -->
+<!-- ========================= -->
 
 <div id="resultBox"
      class="result-bottom">
-
 </div>
 
 <script>
-
-// =========================
-// VOICE SUPPORT
-// =========================
-
-window.SpeechRecognition =
-window.SpeechRecognition ||
-window.webkitSpeechRecognition;
-
-const recognition =
-new webkitSpeechRecognition();
-
-recognition.continuous = false;
-
-recognition.lang = "en-US";
 
 // =========================
 // INIT
 // =========================
 
 const params =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+        window.location.search
+    );
 
 let topic =
-    params.get("topic") || "General Debate";
+    params.get("topic")
+    || "General Debate";
 
 let mode =
-    params.get("mode") || "ai";
+    params.get("mode")
+    || "ai";
 
 // USERNAME
+
 let username =
-    localStorage.getItem("username") || "guest";
+    localStorage.getItem("username")
+    || "guest";
+
+// LAST ARGS
 
 let lastUserArg = "";
 let lastAiArg = "";
+
 let isLoading = false;
 
+// =========================
 // SET UI
+// =========================
 
 document.getElementById(
     "topicTitle"
@@ -130,45 +142,164 @@ document.getElementById(
 document.getElementById(
     "modeTitle"
 ).innerText =
+
     mode === "human"
-        ? "Human Debate 👥"
-        : "AI Debate 🤖";
+
+    ? "Human Debate 👥"
+
+    : "AI Debate 🤖";
 
 // =========================
-// VOICE INPUT
-// =========================
-
-function startVoice(){
-
-    recognition.start();
-}
-
-recognition.onresult = function(event){
-
-    const speech =
-        event.results[0][0].transcript;
-
-    document.getElementById(
-        "argument"
-    ).value = speech;
-};
-
-// =========================
-// CHAT APPEND
+// APPEND MESSAGE
 // =========================
 
 function appendMsg(type, text){
 
     const chat =
-        document.getElementById("chatBox");
+        document.getElementById(
+            "chatBox"
+        );
 
-    chat.innerHTML +=
-        `<div class="msg ${type}">
+    chat.innerHTML += `
+
+        <div class="msg ${type}">
+
             ${text}
-        </div>`;
+
+        </div>
+    `;
+
+    // AUTO SCROLL
 
     chat.scrollTop =
         chat.scrollHeight;
+}
+
+// =========================
+// AI VOICE OUTPUT
+// =========================
+
+function speakText(text){
+
+    // STOP OLD SPEECH
+
+    window.speechSynthesis.cancel();
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+    speech.lang = "en-US";
+
+    speech.rate = 1;
+
+    speech.pitch = 1;
+
+    window.speechSynthesis
+        .speak(speech);
+}
+
+// =========================
+// VOICE INPUT
+// =========================
+
+function startVoiceInput(){
+
+    // SUPPORT CHECK
+
+    const SpeechRecognition =
+
+        window.SpeechRecognition
+        || window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+
+        alert(
+            "Voice recognition not supported in this browser."
+        );
+
+        return;
+    }
+
+    // CREATE INSTANCE
+
+    const recognition =
+        new SpeechRecognition();
+
+    recognition.lang = "en-US";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+    // BUTTON
+
+    const voiceBtn =
+        document.getElementById(
+            "voiceBtn"
+        );
+
+    voiceBtn.innerText =
+        "🎙 Listening...";
+
+    // START
+
+    recognition.start();
+
+    // RESULT
+
+    recognition.onresult =
+        function(event){
+
+        const transcript =
+
+            event.results[0][0]
+                .transcript;
+
+        // PUT TEXT
+
+        document.getElementById(
+            "argument"
+        ).value = transcript;
+
+        // RESET BUTTON
+
+        voiceBtn.innerText =
+            "🎤 Speak";
+
+        // AUTO SEND
+
+        sendArgument();
+    };
+
+    // ERROR
+
+    recognition.onerror =
+        function(event){
+
+        console.log(
+            "Voice Error:",
+            event.error
+        );
+
+        voiceBtn.innerText =
+            "🎤 Speak";
+
+        alert(
+            "Voice input error: "
+            + event.error
+        );
+    };
+
+    // END
+
+    recognition.onend =
+        function(){
+
+        voiceBtn.innerText =
+            "🎤 Speak";
+    };
 }
 
 // =========================
@@ -180,31 +311,45 @@ function sendArgument(){
     if(isLoading) return;
 
     const input =
-        document.getElementById("argument");
+        document.getElementById(
+            "argument"
+        );
 
     const text =
         input.value.trim();
 
     if(text === "") return;
 
+    // SAVE USER ARG
+
     lastUserArg = text;
 
+    // SHOW USER
+
     appendMsg(
+
         "user",
-        `<b>You:</b> ${text}`
+
+        `<b>You:</b><br>${text}`
     );
 
     input.value = "";
 
+    // HUMAN MODE
+
     if(mode === "human"){
 
         appendMsg(
+
             "opponent",
-            `<b>Opponent:</b> ${text}`
+
+            `<b>Opponent:</b><br>${text}`
         );
 
         return;
     }
+
+    // LOADING
 
     isLoading = true;
 
@@ -212,15 +357,22 @@ function sendArgument(){
         "sendBtn"
     ).disabled = true;
 
+    // AI TYPING
+
     const typingId =
         "typing-" + Date.now();
 
     appendMsg(
+
         "ai",
+
         `<span id="${typingId}">
-            <b>AI:</b> typing...
+            <b>AI:</b><br>
+            typing...
         </span>`
     );
+
+    // API CALL
 
     fetch("/api/debate/reply", {
 
@@ -242,35 +394,46 @@ function sendArgument(){
 
     .then(data => {
 
-        if(data.toLowerCase()
-            .includes("i strongly disagree")){
+        // CLEAN TEXT
 
-            data =
-                data.replace(
-                    /i strongly disagree/gi,
-                    "That argument fails because"
-                );
+        data = data
+            .replace(/\n/g, "<br>")
+            .trim();
+
+        // REMOVE REPETITION
+
+        if(
+            data.toLowerCase()
+                .includes(
+                    "i strongly disagree"
+                )
+        ){
+
+            data = data.replace(
+
+                /i strongly disagree/gi,
+
+                "That argument fails because"
+            );
         }
 
+        // SAVE AI ARG
+
         lastAiArg = data;
+
+        // SHOW AI
 
         document.getElementById(
             typingId
         ).innerHTML =
-            `<b>AI:</b> ${data}`;
 
-        // =========================
-        // AI VOICE RESPONSE
-        // =========================
+            `<b>AI:</b><br>${data}`;
 
-        const speech =
-            new SpeechSynthesisUtterance(data);
+        // AI SPEAKS
 
-        speech.lang = "en-US";
-
-        speech.rate = 1;
-
-        window.speechSynthesis.speak(speech);
+        speakText(
+            data.replace(/<br>/g, " ")
+        );
     })
 
     .catch(() => {
@@ -278,6 +441,7 @@ function sendArgument(){
         document.getElementById(
             typingId
         ).innerHTML =
+
             "Error: AI not responding";
     })
 
@@ -306,13 +470,26 @@ function endDebate(){
         return;
     }
 
+    // LOADING RESULT
+
     document.getElementById(
         "resultBox"
-    ).innerHTML =
+    ).innerHTML = `
 
-        `<div class="result-card">
-            Analyzing debate...
-        </div>`;
+        <div class="result-card">
+
+            <h2>
+                🏆 Debate Result
+            </h2>
+
+            <p>
+                Analyzing debate...
+            </p>
+
+        </div>
+    `;
+
+    // API CALL
 
     fetch("/api/debate/analyze", {
 
@@ -336,52 +513,72 @@ function endDebate(){
 
     .then(data => {
 
+        // FORMAT RESULT
+
+        let formattedResult =
+
+            data.result
+
+            .replace(/\n/g, "<br>")
+
+            .replace(
+                /Winner:/g,
+
+                "<br><br><b>🏆 Winner:</b>"
+            )
+
+            .replace(
+                /Reason:/g,
+
+                "<br><br><b>💬 Reason:</b>"
+            )
+
+            .replace(
+                /Score:/g,
+
+                "<br><br><b>📊 Score:</b>"
+            );
+
+        // SHOW RESULT
+
         document.getElementById(
             "resultBox"
-        ).innerHTML =
+        ).innerHTML = `
 
-            `<div class="result-card">
+            <div class="result-card">
 
                 <h2>
                     🏆 Debate Result
                 </h2>
 
-                <p>
-                    ${data.result}
-                </p>
+                <div class="judge-result">
 
-                <p>
-                    <b>Winner:</b>
-                    ${data.winner}
-                </p>
+                    ${formattedResult}
 
-            </div>`;
+                </div>
 
-        localStorage.setItem(
-            "lastWinner",
-            data.winner || ""
-        );
-
-        localStorage.setItem(
-            "lastTopic",
-            data.topic || topic
-        );
-
-        localStorage.setItem(
-            "lastReason",
-            data.result || ""
-        );
+            </div>
+        `;
     })
 
     .catch(() => {
 
         document.getElementById(
             "resultBox"
-        ).innerHTML =
+        ).innerHTML = `
 
-            `<div class="result-card">
-                Error analyzing debate
-            </div>`;
+            <div class="result-card">
+
+                <h2>
+                    ❌ Error
+                </h2>
+
+                <p>
+                    Error analyzing debate.
+                </p>
+
+            </div>
+        `;
     });
 }
 
