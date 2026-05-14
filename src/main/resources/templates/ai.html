@@ -1,73 +1,47 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
 
-const topic =
-    "Social media is harmful";
+<head>
 
-function sendMessage(){
+    <meta charset="UTF-8">
 
-    let input =
-        document.getElementById("input").value;
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    let chat =
-        document.getElementById("chat");
+    <title>AI Voice Debate</title>
 
-    // USER MESSAGE
-    chat.innerHTML += `
-        <div class="user">
-            <div class="bubble-user">
-                ${input}
-            </div>
-        </div>
-    `;
+    <link rel="stylesheet"
+          href="/css/Debate.css">
 
-    // API CALL
-    fetch("/api/debate/reply", {
+</head>
 
-        method: "POST",
+<body>
 
-        headers: {
-            "Content-Type":
-                "application/json"
-        },
+<div class="container">
 
-        body: JSON.stringify({
+    <h1>AI Voice Debate Partner</h1>
 
-            topic: topic,
-            argument: input
+    <div id="chat"></div>
 
-        })
-    })
+    <div class="bottom">
 
-    .then(res => res.text())
+        <input type="text"
+               id="input"
+               placeholder="Enter your argument">
 
-    .then(data => {
+        <button onclick="sendMessage()">
+            Send
+        </button>
 
-        chat.innerHTML += `
-            <div class="ai">
-                <div class="bubble-ai">
-                    ${data}
-                </div>
-            </div>
-        `;
+        <button onclick="startVoice()">
+            🎤 Speak
+        </button>
 
-        chat.scrollTop =
-            chat.scrollHeight;
-    })
+    </div>
 
-    .catch(error => {
+</div>
 
-        console.log(error);
+<script src="/js/ai.js"></script>
 
-        chat.innerHTML += `
-            <div class="ai">
-                <div class="bubble-ai">
-                    AI service error.
-                </div>
-            </div>
-        `;
-    });
-
-    document.getElementById("input").value = "";
-}
-
-</script>
+</body>
+</html>
