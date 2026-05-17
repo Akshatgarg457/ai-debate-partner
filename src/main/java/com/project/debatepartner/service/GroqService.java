@@ -20,7 +20,7 @@ public class GroqService {
             new RestTemplate();
 
     // ======================
-    // API CALL
+    // MAIN API CALL
     // ======================
 
     public String callGroq(
@@ -33,13 +33,14 @@ public class GroqService {
                     new HttpHeaders();
 
             headers.setContentType(
-                    MediaType.APPLICATION_JSON);
+                    MediaType.APPLICATION_JSON
+            );
 
             headers.setBearerAuth(
-                    apiKey);
+                    apiKey
+            );
 
-            Map<String,String>
-            message =
+            Map<String,String> message =
                     new HashMap<>();
 
             message.put(
@@ -52,8 +53,7 @@ public class GroqService {
                     prompt
             );
 
-            Map<String,Object>
-            body=
+            Map<String,Object> body =
                     new HashMap<>();
 
             body.put(
@@ -75,7 +75,7 @@ public class GroqService {
 
             body.put(
                     "max_tokens",
-                    80
+                    140
             );
 
             HttpEntity<Map<String,Object>>
@@ -86,8 +86,7 @@ public class GroqService {
                             headers
                     );
 
-            ResponseEntity<Map>
-                    response =
+            ResponseEntity<Map> response =
 
                     restTemplate.exchange(
 
@@ -100,22 +99,21 @@ public class GroqService {
                             Map.class
                     );
 
-            List choices=
+            List choices =
 
                     (List)
 
-                    response
-                    .getBody()
-                    .get(
-                            "choices"
-                    );
+                    response.getBody()
+                            .get(
+                                    "choices"
+                            );
 
-            Map choice=
+            Map choice =
 
                     (Map)
                     choices.get(0);
 
-            Map msg=
+            Map msg =
 
                     (Map)
                     choice.get(
@@ -133,12 +131,12 @@ public class GroqService {
 
             e.printStackTrace();
 
-            return "AI error";
+            return "AI service error";
         }
     }
 
     // ======================
-    // AI DEBATE
+    // AI DEBATE RESPONSE
     // ======================
 
     public String getDebateResponse(
@@ -150,9 +148,11 @@ public class GroqService {
             String side
     ){
 
-        String aiSide=
+        // AI TAKES OPPOSITE SIDE
 
-                side.equals(
+        String aiSide =
+
+                side.equalsIgnoreCase(
                         "for"
                 )
 
@@ -164,39 +164,54 @@ public class GroqService {
 
                 "for";
 
-        String prompt=
 
-        "You are a human debate opponent.\n"+
+        String prompt =
 
-        "Your fixed side is: "
+        "You are participating in a real student debate.\n\n"+
 
-        + aiSide +
+        "STRICT RULES:\n"+
 
-        "\n"+
+        "1. Your debate side is FIXED as: " + aiSide + "\n"+
 
-        "Never switch sides.\n"+
+        "2. Never switch sides.\n"+
 
-        "Never support user's side.\n"+
+        "3. Never support the user's side.\n"+
 
-        "Reply only in 1-3 short sentences.\n"+
+        "4. Speak like a student trying to win.\n"+
 
-        "Do not write essays.\n"+
+        "5. Never act friendly.\n"+
 
-        "Never be friendly.\n"+
+        "6. Never greet.\n"+
 
-        "Act like a student trying to win.\n"+
+        "7. Never write essays.\n"+
 
-        "If argument is unrelated, say it is off-topic and return to debate.\n\n"+
+        "8. Use simple natural language.\n"+
 
-        "Topic:\n"
+        "9. Normal replies should be 1-3 sentences.\n"+
+
+        "10. If the user's message is unrelated to the topic:\n"+
+
+        "- Say briefly that it is off-topic.\n"+
+
+        "- Then continue defending your side strongly.\n"+
+
+        "- Give 3-5 logical counterpoints.\n"+
+
+        "- Make off-topic responses longer than normal.\n"+
+
+        "11. Stay focused on the debate topic.\n"+
+
+        "12. Sound like a real human opponent.\n\n"+
+
+        "Debate Topic:\n"
 
         + topic +
 
-        "\n\nUser argument:\n"
+        "\n\nUser Argument:\n"
 
         + userArgument +
 
-        "\n\nResponse:";
+        "\n\nDebate Response:";
 
         return callGroq(
                 prompt
@@ -210,25 +225,33 @@ public class GroqService {
     public String analyzeDebate(
 
             String topic,
+
             String userArg,
+
             String aiArg
     ){
 
-        String prompt=
+        String prompt =
+
+                "You are a debate judge.\n\n"+
 
                 "Topic:\n"
 
                 + topic +
 
-                "\n\nUser:\n"
+                "\n\nUser Argument:\n"
 
                 + userArg +
 
-                "\n\nAI:\n"
+                "\n\nAI Argument:\n"
 
                 + aiArg +
 
-                "\n\nWinner:\nReason:\nScore:";
+                "\n\nGive result in this format:\n"+
+
+                "Winner:\n"+
+                "Reason:\n"+
+                "Score:";
 
         return callGroq(
                 prompt
@@ -236,7 +259,7 @@ public class GroqService {
     }
 
     // ======================
-    // HUMAN JUDGE
+    // HUMAN DEBATE JUDGE
     // ======================
 
     public String judgeHumanDebate(
@@ -246,7 +269,9 @@ public class GroqService {
             String debateText
     ){
 
-        String prompt=
+        String prompt =
+
+                "You are a debate judge.\n\n"+
 
                 "Topic:\n"
 
@@ -256,7 +281,11 @@ public class GroqService {
 
                 + debateText +
 
-                "\n\nWinner:\nReason:\nScore:";
+                "\n\nGive result in this format:\n"+
+
+                "Winner:\n"+
+                "Reason:\n"+
+                "Score:";
 
         return callGroq(
                 prompt
