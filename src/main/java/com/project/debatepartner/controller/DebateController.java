@@ -21,28 +21,31 @@ public class DebateController {
     private DebateRepository debateRepository;
 
 
-    // =========================
+    // ======================
     // AI REPLY
-    // =========================
+    // ======================
 
     @PostMapping("/reply")
     public String reply(
-            @RequestBody Map<String,String> body
+
+            @RequestBody
+            Map<String,String> body
     ){
 
         return groqService.getDebateResponse(
 
                 body.get("topic"),
+
                 body.get("argument"),
+
                 body.get("side")
         );
     }
 
 
-
-    // =========================
+    // ======================
     // ANALYZE + SAVE
-    // =========================
+    // ======================
 
     @PostMapping("/analyze")
     public Map<String,String> analyze(
@@ -51,22 +54,25 @@ public class DebateController {
             Map<String,String> body
     ){
 
-        String topic=
+        String topic =
                 body.get("topic");
 
-        String userArg=
+        String userArg =
                 body.get("userArg");
 
-        String aiArg=
+        String aiArg =
                 body.get("aiArg");
 
-        String username=
+        String username =
                 body.getOrDefault(
                         "username",
                         "guest"
                 );
 
-        String result=
+
+        // Get AI judge result
+
+        String result =
 
                 groqService.analyzeDebate(
 
@@ -75,25 +81,57 @@ public class DebateController {
                         aiArg
                 );
 
-        String winner="AI";
+
+        // fallback result
+
+        if(
+                result == null
+                ||
+                result.trim().isEmpty()
+        ){
+
+            result =
+
+            "Winner: AI\n" +
+
+            "Reason: Analysis unavailable\n" +
+
+            "Score: User 0/10 , AI 0/10";
+        }
+
+
+        // detect winner
+
+        String winner = "AI";
+
+        String lowerResult =
+
+                result.toLowerCase();
 
         if(
 
-                result!=null
-
-                &&
-
-                result.toLowerCase()
-                .contains(
+                lowerResult.contains(
                         "winner: user"
                 )
         ){
 
-            winner="User";
+            winner = "User";
+        }
+
+        else if(
+
+                lowerResult.contains(
+                        "winner: ai"
+                )
+        ){
+
+            winner = "AI";
         }
 
 
-        Debate debate=
+        // SAVE DATABASE
+
+        Debate debate =
                 new Debate();
 
         debate.setUsername(
@@ -120,31 +158,20 @@ public class DebateController {
                 winner
         );
 
-
-        Debate saved=
-
-                debateRepository.save(
-                        debate
-                );
-
-        System.out.println(
-
-                "Saved ID: "
-
-                +
-
-                saved.getId()
+        debateRepository.save(
+                debate
         );
 
 
+        // SEND RESPONSE
+
         Map<String,String>
-                response=
+                response =
                 new HashMap<>();
 
-
         response.put(
-                "topic",
-                topic
+                "winner",
+                winner
         );
 
         response.put(
@@ -152,20 +179,14 @@ public class DebateController {
                 result
         );
 
-        response.put(
-                "winner",
-                winner
-        );
-
-
         return response;
     }
 
 
 
-    // =========================
+    // ======================
     // HISTORY
-    // =========================
+    // ======================
 
     @GetMapping("/history")
     public List<Debate>
@@ -176,18 +197,19 @@ public class DebateController {
     }
 
 
-
-    // =========================
+    // ======================
     // LAST RESULT
-    // =========================
+    // ======================
 
     @GetMapping("/last")
-    public Debate getLastResult(){
+    public Debate
+    getLastResult(){
 
         List<Debate>
-        debates=
+                debates =
 
-        debateRepository.findAll();
+                debateRepository
+                        .findAll();
 
         if(
                 debates.isEmpty()
