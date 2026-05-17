@@ -1,13 +1,14 @@
 package com.project.debatepartner.controller;
 
-import com.project.debatepartner.model.*;
+import com.project.debatepartner.model.Debate;
+import com.project.debatepartner.model.DebateRoom;
+import com.project.debatepartner.model.Message;
 import com.project.debatepartner.repository.DebateRepository;
-import com.project.debatepartner.service.*;
+import com.project.debatepartner.service.DebateRoomService;
+import com.project.debatepartner.service.GroqService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/human")
@@ -24,10 +25,17 @@ public class HumanDebateController {
     private DebateRepository debateRepository;
 
 
+    // ======================
+    // CREATE ROOM
+    // ======================
+
     @PostMapping("/create")
     public DebateRoom createRoom(
+
             @RequestParam String topic,
-            @RequestParam String username){
+
+            @RequestParam String username
+    ){
 
         return service.createRoom(
                 topic,
@@ -36,10 +44,17 @@ public class HumanDebateController {
     }
 
 
+    // ======================
+    // JOIN ROOM
+    // ======================
+
     @PostMapping("/join")
     public DebateRoom joinRoom(
+
             @RequestParam String roomId,
-            @RequestParam String username){
+
+            @RequestParam String username
+    ){
 
         return service.joinRoom(
                 roomId,
@@ -48,9 +63,15 @@ public class HumanDebateController {
     }
 
 
+    // ======================
+    // GET ROOM
+    // ======================
+
     @GetMapping("/room/{roomId}")
     public DebateRoom getRoom(
-            @PathVariable String roomId){
+
+            @PathVariable String roomId
+    ){
 
         return service.getRoom(
                 roomId
@@ -58,11 +79,19 @@ public class HumanDebateController {
     }
 
 
+    // ======================
+    // END DEBATE + RESULT
+    // ======================
+
     @PostMapping("/end/{roomId}")
     public DebateRoom endDebate(
-            @PathVariable String roomId){
+
+            @PathVariable
+            String roomId
+    ){
 
         DebateRoom room =
+
                 service.getRoom(
                         roomId
                 );
@@ -72,65 +101,122 @@ public class HumanDebateController {
             return null;
         }
 
+
+        // combine debate messages
+
         StringBuilder debateText =
                 new StringBuilder();
 
+
         for(
-                Message msg
-                : room.getMessages()
+                Message msg :
+                room.getMessages()
         ){
 
             debateText.append(
+
                     msg.getSender()
+
             )
 
             .append(": ")
 
             .append(
+
                     msg.getContent()
+
             )
 
             .append("\n");
         }
 
+
+        // judge debate
+
         String result =
 
                 groqService
-                        .judgeHumanDebate(
+                .judgeHumanDebate(
 
-                                room.getTopic(),
+                        room.getTopic(),
 
-                                debateText.toString()
-                        );
+                        debateText.toString()
+                );
+
+
+        // fallback result
+
+        if(
+                result==null
+                ||
+                result.trim().isEmpty()
+        ){
+
+            result=
+
+            "Winner: Draw\n"+
+
+            "Reason: Unable to analyze debate\n"+
+
+            "Score: Player1 0/10, Player2 0/10";
+        }
+
 
         room.setResult(
                 result
         );
 
+
+        // detect winner
+
+        String winner="Draw";
+
+        String lower=
+
+                result.toLowerCase();
+
+
         if(
-                result.toLowerCase()
-                .contains(
+
+                lower.contains(
+
                         room.getPlayer1()
-                                .toLowerCase()
+                        .toLowerCase()
+
                 )
+
         ){
 
-            room.setWinner(
-                    room.getPlayer1()
-            );
+            winner=
+                    room.getPlayer1();
         }
 
-        else{
+        else if(
 
-            room.setWinner(
-                    room.getPlayer2()
-            );
+                lower.contains(
+
+                        room.getPlayer2()
+                        .toLowerCase()
+
+                )
+
+        ){
+
+            winner=
+                    room.getPlayer2();
         }
 
 
-        // DATABASE SAVE
+        room.setWinner(
+                winner
+        );
 
-        Debate debate =
+
+        // ======================
+        // SAVE DATABASE HISTORY
+        // ======================
+
+        Debate debate=
                 new Debate();
 
         debate.setUsername(
@@ -163,12 +249,13 @@ public class HumanDebateController {
         );
 
         debate.setWinner(
-                room.getWinner()
+                winner
         );
 
         debateRepository.save(
                 debate
         );
+
 
         return room;
     }
