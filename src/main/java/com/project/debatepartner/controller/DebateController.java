@@ -11,87 +11,182 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/debate")
+@CrossOrigin("*")
 public class DebateController {
 
     @Autowired
     private GroqService groqService;
 
-    // REMOVE DATABASE FOR NOW
-    // @Autowired
-    // private DebateRepository debateRepository;
+    @Autowired
+    private DebateRepository debateRepository;
 
     // =========================
     // AI REPLY
     // =========================
+
     @PostMapping("/reply")
-    public String reply(@RequestBody Map<String, String> body) {
+    public String reply(
+            @RequestBody Map<String,String> body
+    ){
 
         return groqService.getDebateResponse(
+
                 body.get("topic"),
+
                 body.get("argument")
         );
     }
 
     // =========================
-    // ANALYZE
+    // ANALYZE + SAVE
     // =========================
-    @PostMapping("/analyze")
-    public Map<String, String> analyze(@RequestBody Map<String, String> body) {
 
-        String topic = body.get("topic");
-        String userArg = body.get("userArg");
-        String aiArg = body.get("aiArg");
+    @PostMapping("/analyze")
+    public Map<String,String> analyze(
+
+            @RequestBody Map<String,String> body
+    ){
+
+        String topic =
+                body.get("topic");
+
+        String userArg =
+                body.get("userArg");
+
+        String aiArg =
+                body.get("aiArg");
+
+        String username =
+                body.getOrDefault(
+                        "username",
+                        "guest"
+                );
 
         // AI ANALYSIS
-        String resultText =
-                groqService.analyzeDebate(topic, userArg, aiArg);
 
-        // WINNER
+        String resultText =
+
+                groqService.analyzeDebate(
+
+                        topic,
+                        userArg,
+                        aiArg
+                );
+
         String winner = "AI";
 
-        if(resultText != null){
+        if(resultText!=null){
 
-            if(resultText.toLowerCase().contains("winner: user")){
-                winner = "User";
+            if(resultText.toLowerCase()
+                    .contains(
+                            "winner: user"
+                    )){
+
+                winner="User";
             }
-            else if(resultText.toLowerCase().contains("winner: ai")){
-                winner = "AI";
+
+            else if(
+                    resultText
+                            .toLowerCase()
+                            .contains(
+                                    "winner: ai"
+                            )
+            ){
+
+                winner="AI";
             }
         }
 
-        if(resultText == null || resultText.isEmpty()){
-            resultText = "Analysis failed.";
-        }
+        // SAVE DATABASE
+
+        Debate debate =
+                new Debate();
+
+        debate.setUsername(
+                username
+        );
+
+        debate.setTopic(
+                topic
+        );
+
+        debate.setUserArgument(
+                userArg
+        );
+
+        debate.setAiArgument(
+                aiArg
+        );
+
+        debate.setResult(
+                resultText
+        );
+
+        debate.setWinner(
+                winner
+        );
+
+        debateRepository.save(
+                debate
+        );
 
         // RESPONSE
-        Map<String, String> response = new HashMap<>();
 
-        response.put("topic", topic);
-        response.put("result", resultText);
-        response.put("winner", winner);
+        Map<String,String>
+                response =
+                new HashMap<>();
+
+        response.put(
+                "topic",
+                topic
+        );
+
+        response.put(
+                "result",
+                resultText
+        );
+
+        response.put(
+                "winner",
+                winner
+        );
 
         return response;
     }
 
     // =========================
-    // TEMP HISTORY
+    // HISTORY
     // =========================
+
     @GetMapping("/history")
-    public List<String> getHistory() {
+    public List<Debate> getHistory(){
 
-        List<String> list = new ArrayList<>();
-
-        list.add("Database disabled temporarily.");
-
-        return list;
+        return debateRepository
+                .findAll();
     }
 
     // =========================
-    // TEMP LAST RESULT
+    // LAST RESULT
     // =========================
+
     @GetMapping("/last")
-    public String getLastResult() {
+    public Debate getLastResult(){
 
-        return "Database disabled temporarily.";
+        List<Debate> debates =
+
+                debateRepository
+                        .findAll();
+
+        if(
+                debates.isEmpty()
+        ){
+
+            return null;
+        }
+
+        return debates.get(
+                debates.size()-1
+        );
     }
+
 }

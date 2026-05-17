@@ -19,18 +19,13 @@ public class GroqService {
     private final RestTemplate restTemplate =
             new RestTemplate();
 
-    // =========================
-    // MAIN API CALL
-    // =========================
+    // ======================
+    // MAIN API
+    // ======================
 
     public String callGroq(String prompt){
 
         try{
-
-            if(apiKey == null || apiKey.isEmpty()){
-
-                return "Groq API key missing.";
-            }
 
             HttpHeaders headers =
                     new HttpHeaders();
@@ -71,16 +66,14 @@ public class GroqService {
                     )
             );
 
-            // Slight creativity
             body.put(
                     "temperature",
                     0.7
             );
 
-            // Limit huge outputs
             body.put(
                     "max_tokens",
-                    120
+                    100
             );
 
             HttpEntity<Map<String,Object>>
@@ -94,61 +87,48 @@ public class GroqService {
             ResponseEntity<Map> response =
 
                     restTemplate.exchange(
-
                             API_URL,
                             HttpMethod.POST,
                             request,
                             Map.class
                     );
 
-            if(response.getBody()==null){
-
-                return "Empty AI response.";
-            }
-
             List choices =
-
                     (List)
-                            response.getBody()
-                                    .get(
-                                            "choices"
-                                    );
-
-            if(
-                    choices==null
-                            ||
-                            choices.isEmpty()
-            ){
-
-                return "No AI response.";
-            }
+                    response.getBody()
+                            .get(
+                                    "choices"
+                            );
 
             Map choice =
                     (Map)
-                            choices.get(0);
+                    choices.get(0);
 
             Map msg =
                     (Map)
-                            choice.get(
-                                    "message"
-                            );
+                    choice.get(
+                            "message"
+                    );
 
             return msg
-                    .get("content")
+                    .get(
+                            "content"
+                    )
                     .toString();
+
         }
 
         catch(Exception e){
 
             e.printStackTrace();
 
-            return "AI service error.";
+            return "AI service error";
         }
     }
 
-    // =========================
-    // HUMAN-LIKE AI DEBATE
-    // =========================
+    // ======================
+    // AI DEBATE RESPONSE
+    // ======================
 
     public String getDebateResponse(
             String topic,
@@ -161,37 +141,42 @@ public class GroqService {
 
                 "Rules:\n"+
 
-                "- Keep response short.\n"+
-
-                "- Maximum 2 to 4 sentences only.\n"+
+                "- Keep replies short (2-4 sentences only).\n"+
 
                 "- Speak naturally like a student.\n"+
 
-                "- Do not write essays.\n"+
+                "- No essays.\n"+
 
-                "- Give logical counter arguments.\n"+
+                "- No formal language.\n"+
 
-                "- Do not say 'Greetings', 'I respectfully disagree', or formal words.\n"+
+                "- Give logical counterarguments.\n"+
 
-                "- Sound like a real person arguing.\n"+
+                "- Sound like a real person.\n"+
 
-                "- Avoid repeating the user's argument.\n\n"+
+                "- Avoid greetings.\n"+
 
-                "Topic: "
+                "- If user says something unrelated, briefly mention it is off-topic and naturally return to the debate.\n"+
+
+                "- Do not completely ignore what the user said.\n\n"+
+
+                "Debate topic:\n"
+
                 + topic +
 
-                "\n\nOpponent argument:\n"
+                "\n\nUser argument:\n"
 
                 + userArgument +
 
-                "\n\nYour response:";
+                "\n\nReply:";
 
-        return callGroq(prompt);
+        return callGroq(
+                prompt
+        );
     }
 
-    // =========================
+    // ======================
     // AI JUDGE
-    // =========================
+    // ======================
 
     public String analyzeDebate(
 
@@ -221,20 +206,20 @@ public class GroqService {
                 "Winner:\n"+
                 "Reason:\n"+
                 "Score:";
-        
+
         return callGroq(
                 prompt
         );
     }
 
-    // =========================
-    // HUMAN VS HUMAN JUDGE
-    // =========================
+    // ======================
+    // HUMAN JUDGE
+    // ======================
 
     public String judgeHumanDebate(
 
             String topic,
-            String fullDebate
+            String debateText
     ){
 
         String prompt =
@@ -247,7 +232,7 @@ public class GroqService {
 
                 "\n\nDebate:\n"
 
-                + fullDebate +
+                + debateText +
 
                 "\n\nGive:\n"+
 
