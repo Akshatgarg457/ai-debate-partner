@@ -20,6 +20,7 @@ public class DebateController {
     @Autowired
     private DebateRepository debateRepository;
 
+
     // =========================
     // AI REPLY
     // =========================
@@ -32,12 +33,12 @@ public class DebateController {
         return groqService.getDebateResponse(
 
                 body.get("topic"),
-
                 body.get("argument"),
-
                 body.get("side")
         );
     }
+
+
 
     // =========================
     // ANALYZE + SAVE
@@ -46,25 +47,26 @@ public class DebateController {
     @PostMapping("/analyze")
     public Map<String,String> analyze(
 
-            @RequestBody Map<String,String> body
+            @RequestBody
+            Map<String,String> body
     ){
 
-        String topic =
+        String topic=
                 body.get("topic");
 
-        String userArg =
+        String userArg=
                 body.get("userArg");
 
-        String aiArg =
+        String aiArg=
                 body.get("aiArg");
 
-        String username =
+        String username=
                 body.getOrDefault(
                         "username",
                         "guest"
                 );
 
-        String resultText =
+        String result=
 
                 groqService.analyzeDebate(
 
@@ -75,28 +77,23 @@ public class DebateController {
 
         String winner="AI";
 
-        if(resultText!=null){
+        if(
 
-            if(resultText
-                    .toLowerCase()
-                    .contains(
-                            "winner: user"
-                    )){
+                result!=null
 
-                winner="User";
-            }
+                &&
 
-            else if(resultText
-                    .toLowerCase()
-                    .contains(
-                            "winner: ai"
-                    )){
+                result.toLowerCase()
+                .contains(
+                        "winner: user"
+                )
+        ){
 
-                winner="AI";
-            }
+            winner="User";
         }
 
-        Debate debate =
+
+        Debate debate=
                 new Debate();
 
         debate.setUsername(
@@ -116,20 +113,34 @@ public class DebateController {
         );
 
         debate.setResult(
-                resultText
+                result
         );
 
         debate.setWinner(
                 winner
         );
 
-        debateRepository.save(
-                debate
+
+        Debate saved=
+
+                debateRepository.save(
+                        debate
+                );
+
+        System.out.println(
+
+                "Saved ID: "
+
+                +
+
+                saved.getId()
         );
+
 
         Map<String,String>
                 response=
                 new HashMap<>();
+
 
         response.put(
                 "topic",
@@ -138,7 +149,7 @@ public class DebateController {
 
         response.put(
                 "result",
-                resultText
+                result
         );
 
         response.put(
@@ -146,8 +157,11 @@ public class DebateController {
                 winner
         );
 
+
         return response;
     }
+
+
 
     // =========================
     // HISTORY
@@ -161,19 +175,19 @@ public class DebateController {
                 .findAll();
     }
 
+
+
     // =========================
-    // LAST
+    // LAST RESULT
     // =========================
 
     @GetMapping("/last")
-    public Debate
-    getLastResult(){
+    public Debate getLastResult(){
 
         List<Debate>
         debates=
 
-        debateRepository
-                .findAll();
+        debateRepository.findAll();
 
         if(
                 debates.isEmpty()
@@ -186,4 +200,5 @@ public class DebateController {
                 debates.size()-1
         );
     }
+
 }

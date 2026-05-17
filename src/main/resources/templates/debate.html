@@ -2,10 +2,10 @@
 <html>
 <head>
 
-    <title>Debate</title>
+<title>Debate</title>
 
-    <link rel="stylesheet"
-          href="/css/Debate.css">
+<link rel="stylesheet"
+      href="/css/Debate.css">
 
 </head>
 
@@ -13,119 +13,173 @@
 
 <div class="header">
 
-    <h2 id="modeTitle">
-        Debate Mode
-    </h2>
+<h2 id="modeTitle">
+Debate Mode
+</h2>
 
-    <a href="/dashboard"
-       class="back-btn">
+<a href="/dashboard"
+class="back-btn">
 
-        ← Back
+← Back
 
-    </a>
+</a>
 
 </div>
+
 
 <div class="container">
 
-    <h1>
-        Start Your Debate
-    </h1>
+<h1>
+Start Your Debate
+</h1>
 
-    <h2 id="topicTitle">
-        Topic: Loading...
-    </h2>
+<h2 id="topicTitle">
+Topic: Loading...
+</h2>
 
-    <h3 id="sideTitle"></h3>
+<h3 id="sideTitle"></h3>
 
-    <div id="chatBox"
-         class="chat-box">
-    </div>
 
-    <div class="input-section">
-
-        <textarea id="argument"
-                  placeholder="Type or speak your argument...">
-        </textarea>
-
-        <div class="button-group">
-
-            <button onclick="sendArgument()"
-                    id="sendBtn">
-
-                Send
-            </button>
-
-            <button onclick="startVoiceInput()"
-                    id="voiceBtn">
-
-                🎤 Speak
-            </button>
-
-            <button onclick="endDebate()"
-                    class="end-btn">
-
-                End Debate
-            </button>
-
-        </div>
-
-    </div>
+<div id="chatBox"
+class="chat-box">
 
 </div>
 
-<div id="resultBox"
-     class="result-bottom">
+
+<div class="input-section">
+
+<textarea
+id="argument"
+placeholder="Type or speak your argument...">
+</textarea>
+
+
+<div class="button-group">
+
+<button
+onclick="sendArgument()">
+
+Send
+
+</button>
+
+
+<button
+id="voiceBtn"
+onclick="startVoiceInput()">
+
+🎤 Speak
+
+</button>
+
+
+<button
+class="end-btn"
+onclick="endDebate()">
+
+End Debate
+
+</button>
+
 </div>
+
+</div>
+
+</div>
+
+
+<div
+id="resultBox"
+class="result-bottom">
+
+</div>
+
+
 
 <script>
 
-// ======================
+//======================
 // URL PARAMS
-// ======================
+//======================
 
-const params =
+const params=
+
 new URLSearchParams(
 window.location.search
 );
 
-let topic =
-params.get("topic")
-|| "General Debate";
+let topic=
 
-let mode =
-params.get("mode")
-|| "ai";
+params.get(
+"topic"
+)
 
-let side =
-params.get("side")
-|| "for";
+||
 
-let username =
+"General Debate";
+
+
+let mode=
+
+params.get(
+"mode"
+)
+
+||
+
+"ai";
+
+
+let side=
+
+params.get(
+"side"
+)
+
+||
+
+"for";
+
+
+let username=
+
 localStorage.getItem(
 "username"
 )
-|| "guest";
+
+||
+
+"guest";
+
 
 let lastUserArg="";
 let lastAiArg="";
 let isLoading=false;
 
 
-// ======================
+
+//======================
 // UI
-// ======================
+//======================
 
 document.getElementById(
 "topicTitle"
-).innerText=
+)
+
+.innerText=
 
 "Topic: "
-+topic;
+
++
+
+topic;
+
 
 document.getElementById(
 "modeTitle"
-).innerText=
+)
+
+.innerText=
 
 mode==="human"
 
@@ -140,7 +194,9 @@ mode==="human"
 
 document.getElementById(
 "sideTitle"
-).innerHTML=
+)
+
+.innerHTML=
 
 side==="for"
 
@@ -153,12 +209,15 @@ side==="for"
 "🔴 Your Side: Against";
 
 
-// ======================
+
+//======================
 // CHAT
-// ======================
+//======================
 
 function appendMsg(
+
 type,
+
 text
 ){
 
@@ -168,20 +227,31 @@ document.getElementById(
 "chatBox"
 );
 
+
 chat.innerHTML+=
 
-`<div class="msg ${type}">
+`
+
+<div class="msg ${type}">
+
 ${text}
-</div>`;
+
+</div>
+
+`;
+
 
 chat.scrollTop=
+
 chat.scrollHeight;
+
 }
 
 
-// ======================
-// SPEAK OUTPUT
-// ======================
+
+//======================
+// AI VOICE
+//======================
 
 function speakText(
 text
@@ -191,7 +261,7 @@ window
 .speechSynthesis
 .cancel();
 
-const speech=
+let speech=
 
 new SpeechSynthesisUtterance(
 text
@@ -205,22 +275,29 @@ window
 .speak(
 speech
 );
+
 }
 
 
-// ======================
+
+//======================
 // LONG VOICE INPUT
-// ======================
+//======================
 
 let recognition;
+
+let isListening=false;
 
 function startVoiceInput(){
 
 const SpeechRecognition=
 
 window.SpeechRecognition
+
 ||
+
 window.webkitSpeechRecognition;
+
 
 if(!SpeechRecognition){
 
@@ -231,6 +308,26 @@ alert(
 return;
 }
 
+
+if(isListening){
+
+recognition.stop();
+
+isListening=false;
+
+document.getElementById(
+"voiceBtn"
+)
+
+.innerText=
+
+"🎤 Speak";
+
+return;
+
+}
+
+
 recognition=
 
 new SpeechRecognition();
@@ -239,26 +336,32 @@ recognition.continuous=true;
 
 recognition.interimResults=true;
 
-recognition.lang=
-"en-US";
+recognition.lang="en-US";
 
-let finalText="";
 
-const voiceBtn=
+let finalTranscript="";
+
+isListening=true;
+
 
 document.getElementById(
 "voiceBtn"
-);
+)
 
-voiceBtn.innerText=
-"🎙 Listening...";
+.innerText=
+
+"⏹ Stop";
+
 
 recognition.start();
 
+
 recognition.onresult=
+
 function(event){
 
 let interim="";
+
 
 for(
 
@@ -276,14 +379,19 @@ let transcript=
 event.results[i][0]
 .transcript;
 
+
 if(
 event.results[i]
 .isFinal
 ){
 
-finalText+=
+finalTranscript+=
+
 transcript
-+" ";
+
++
+
+" ";
 }
 
 else{
@@ -294,41 +402,47 @@ transcript;
 
 }
 
+
 document.getElementById(
 "argument"
-).value=
+)
 
-finalText
+.value=
+
+finalTranscript
+
 +
+
 interim;
+
 };
 
-voiceBtn.onclick=
-function(){
-
-recognition.stop();
-
-voiceBtn.innerText=
-"🎤 Speak";
-};
 
 recognition.onend=
+
 function(){
 
-voiceBtn.innerText=
-"🎤 Speak";
+if(
+isListening
+){
+
+recognition.start();
+}
 };
+
 }
 
 
-// ======================
+
+//======================
 // SEND
-// ======================
+//======================
 
 function sendArgument(){
 
 if(isLoading)
 return;
+
 
 let input=
 
@@ -336,42 +450,54 @@ document.getElementById(
 "argument"
 );
 
+
 let text=
+
 input.value.trim();
+
 
 if(text==="")
 return;
 
+
 lastUserArg=
 text;
+
 
 appendMsg(
 
 "user",
 
 `<b>You:</b><br>${text}`
+
 );
+
 
 input.value="";
 
+
 isLoading=true;
+
 
 let typingId=
 
 "typing"
 
 +
+
 Date.now();
+
 
 appendMsg(
 
 "ai",
 
 `<span id="${typingId}">
-<b>AI:</b>
-typing...
+<b>AI:</b> typing...
 </span>`
+
 );
+
 
 fetch(
 
@@ -384,10 +510,12 @@ method:"POST",
 headers:{
 
 "Content-Type":
+
 "application/json"
 },
 
 body:
+
 JSON.stringify({
 
 topic:
@@ -398,8 +526,10 @@ text,
 
 side:
 side
+
 })
 }
+
 )
 
 .then(
@@ -412,6 +542,7 @@ data=>{
 lastAiArg=
 data;
 
+
 document
 .getElementById(
 typingId
@@ -419,14 +550,14 @@ typingId
 
 .innerHTML=
 
-`<b>AI:</b><br>
-${data}`;
+`<b>AI:</b><br>${data}`;
+
 
 speakText(
 data
 );
-}
-)
+
+})
 
 .catch(()=>{
 
@@ -438,19 +569,23 @@ typingId
 .innerHTML=
 
 "AI Error";
+
 })
 
 .finally(()=>{
 
 isLoading=
 false;
+
 });
+
 }
 
 
-// ======================
-// END
-// ======================
+
+//======================
+// END DEBATE
+//======================
 
 function endDebate(){
 
@@ -467,6 +602,7 @@ alert(
 return;
 }
 
+
 fetch(
 
 "/api/debate/analyze",
@@ -478,10 +614,12 @@ method:"POST",
 headers:{
 
 "Content-Type":
+
 "application/json"
 },
 
 body:
+
 JSON.stringify({
 
 topic:
@@ -495,16 +633,37 @@ lastAiArg,
 
 username:
 username
+
 })
+
 }
+
 )
 
 .then(
-res=>res.json()
+response=>response.json()
 )
 
 .then(
 data=>{
+
+let result=
+
+data.result
+
+||
+
+"No result generated";
+
+
+let winner=
+
+data.winner
+
+||
+
+"Unknown";
+
 
 document
 .getElementById(
@@ -513,20 +672,56 @@ document
 
 .innerHTML=
 
-`<div class="result-card">
+`
+
+<div class="result-card">
 
 <h2>
+
 🏆 Debate Result
+
 </h2>
+
+<h3>
+
+Winner:
+${winner}
+
+</h3>
 
 <p>
 
-${data.result}
+${result}
 
 </p>
 
-</div>`;
+</div>
+
+`;
+
+})
+
+.catch(()=>{
+
+document
+.getElementById(
+"resultBox"
+)
+
+.innerHTML=
+
+`
+
+<div class="result-card">
+
+Error loading result
+
+</div>
+
+`;
+
 });
+
 }
 
 </script>
