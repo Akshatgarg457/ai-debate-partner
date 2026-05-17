@@ -2,76 +2,23 @@ window.SpeechRecognition =
 window.SpeechRecognition ||
 window.webkitSpeechRecognition;
 
-const recognition =
+
+// =========================
+// VOICE
+// =========================
+
+let recognition =
 new webkitSpeechRecognition();
 
-recognition.continuous = true;
-recognition.lang = "en-US";
-recognition.interimResults = true;
+recognition.continuous=true;
+recognition.interimResults=true;
+recognition.lang="en-US";
 
 let isListening=false;
 
-// =========================
-// VOICE INPUT
-// =========================
-
-function startVoice(){
-
-    if(isListening){
-
-        recognition.stop();
-
-        isListening=false;
-
-        document.getElementById(
-            "voiceBtn"
-        ).innerText=
-        "🎤 Speak";
-
-        return;
-    }
-
-    isListening=true;
-
-    document.getElementById(
-        "voiceBtn"
-    ).innerText=
-    "⏹ Stop";
-
-    recognition.start();
-}
-
-recognition.onresult=function(event){
-
-    let transcript="";
-
-    for(
-        let i=event.resultIndex;
-        i<event.results.length;
-        i++
-    ){
-
-        transcript +=
-        event.results[i][0]
-        .transcript;
-    }
-
-    document.getElementById(
-        "messageInput"
-    ).value=
-    transcript;
-};
-
-recognition.onend=function(){
-
-    if(isListening){
-
-        recognition.start();
-    }
-};
 
 // =========================
-// ROOM INFO
+// URL PARAMS
 // =========================
 
 let params=
@@ -93,126 +40,194 @@ let stompClient=null;
 
 
 // =========================
-// CONNECT
+// CONNECT SOCKET
 // =========================
 
 function connect(){
 
-    let socket=
-    new SockJS('/ws');
+let socket=
+new SockJS("/ws");
 
-    stompClient=
-    Stomp.over(socket);
+stompClient=
+Stomp.over(socket);
 
-    stompClient.connect(
+stompClient.connect(
 
-        {},
+{},
 
-        function(){
+function(){
 
-            stompClient.subscribe(
+// CHAT
 
-                '/topic/messages',
+stompClient.subscribe(
 
-                function(msg){
+"/topic/messages",
 
-                    let data=
-                    JSON.parse(
-                        msg.body
-                    );
+function(msg){
 
-                    if(
-                        data.roomId!==roomId
-                    )
-                    return;
+let data=
 
-                    showMessage(
-                        data
-                    );
-                }
-            );
+JSON.parse(
+msg.body
+);
 
-            stompClient.subscribe(
+if(
+data.roomId!==roomId
+)
+return;
 
-                '/topic/status',
+showMessage(
+data
+);
 
-                function(msg){
-
-                    let data=
-                    JSON.parse(
-                        msg.body
-                    );
-
-                    if(
-                        data.roomId!==roomId
-                    )
-                    return;
-
-                    if(
-                        data.type==="JOIN"
-                    ){
-
-                        showStatus(
-
-                            data.sender+
-                            " joined"
-
-                        );
-
-                        checkPlayers();
-                    }
-                }
-            );
+}
+);
 
 
-            stompClient.subscribe(
+// PLAYER STATUS
 
-                '/topic/end',
+stompClient.subscribe(
 
-                function(msg){
+"/topic/status",
 
-                    let data=
-                    JSON.parse(
-                        msg.body
-                    );
+function(msg){
 
-                    if(
-                        data.roomId!==roomId
-                    )
-                    return;
+let data=
 
-                    loadDebateResult();
-                }
-            );
+JSON.parse(
+msg.body
+);
+
+if(
+data.roomId!==roomId
+)
+return;
+
+if(
+data.type==="JOIN"
+){
+
+showStatus(
+
+data.sender+
+" joined"
+
+);
+
+checkPlayers();
+
+}
+
+}
+);
 
 
-            stompClient.send(
+// END EVENT
 
-                "/app/join",
+stompClient.subscribe(
 
-                {},
+"/topic/end",
 
-                JSON.stringify({
+function(msg){
 
-                    roomId:
-                    roomId,
+let data=
 
-                    sender:
-                    username
-                })
-            );
-        }
-    );
+JSON.parse(
+msg.body
+);
+
+if(
+data.roomId!==roomId
+)
+return;
+
+loadDebateResult();
+
+}
+);
+
+
+// JOIN EVENT
+
+stompClient.send(
+
+"/app/join",
+
+{},
+
+JSON.stringify({
+
+roomId:
+roomId,
+
+sender:
+username
+
+})
+
+);
+
+}
+);
+
 }
 
 
 // =========================
-// PLAYER CHECK
+// LOAD ROOM
+// =========================
+
+function loadRoom(){
+
+fetch(
+
+`/human/room/${roomId}`
+
+)
+
+.then(
+res=>res.json()
+)
+
+.then(room=>{
+
+if(!room)
+return;
+
+document.getElementById(
+"topic"
+)
+
+.innerText=
+room.topic;
+
+
+document.getElementById(
+"roomIdText"
+)
+
+.innerText=
+room.roomId;
+
+
+checkPlayers();
+
+});
+
+}
+
+
+// =========================
+// CHECK PLAYERS
 // =========================
 
 function checkPlayers(){
 
-fetch(`/human/room/${roomId}`)
+fetch(
+
+`/human/room/${roomId}`
+
+)
 
 .then(
 res=>res.json()
@@ -230,6 +245,7 @@ room.player2
 2
 :
 1;
+
 
 document.getElementById(
 "playerStatus"
@@ -265,45 +281,6 @@ document.getElementById(
 
 
 // =========================
-// LOAD ROOM
-// =========================
-
-function loadRoom(){
-
-fetch(`/human/room/${roomId}`)
-
-.then(
-res=>res.json()
-)
-
-.then(room=>{
-
-if(room){
-
-document.getElementById(
-"topic"
-)
-
-.innerText=
-room.topic;
-
-
-document.getElementById(
-"roomIdText"
-)
-
-.innerText=
-room.roomId;
-
-checkPlayers();
-}
-
-});
-
-}
-
-
-// =========================
 // MESSAGE
 // =========================
 
@@ -315,7 +292,9 @@ document.getElementById(
 "chatBox"
 );
 
-chat.innerHTML+=`
+chat.innerHTML+=
+
+`
 
 <div class="message">
 
@@ -332,9 +311,10 @@ ${msg.content}
 `;
 
 chat.scrollTop=
-
 chat.scrollHeight;
+
 }
+
 
 
 // =========================
@@ -356,6 +336,7 @@ input.value.trim();
 if(content==="")
 return;
 
+
 stompClient.send(
 
 "/app/chat",
@@ -374,10 +355,14 @@ content:
 content
 
 })
+
 );
 
+
 input.value="";
+
 }
+
 
 
 // =========================
@@ -392,7 +377,9 @@ document.getElementById(
 "chatBox"
 );
 
-chat.innerHTML+=`
+chat.innerHTML+=
+
+`
 
 <div class="status-msg">
 
@@ -403,6 +390,7 @@ ${text}
 `;
 
 }
+
 
 
 // =========================
@@ -416,6 +404,7 @@ document.getElementById(
 )
 
 .disabled=true;
+
 
 fetch(
 
@@ -433,10 +422,14 @@ res=>res.json()
 
 .then(room=>{
 
+console.log(
+room
+);
+
 if(!room){
 
 alert(
-"Error ending debate"
+"Unable to generate result"
 );
 
 return;
@@ -446,13 +439,26 @@ showResult(
 room
 );
 
+})
+
+.catch(error=>{
+
+console.log(
+error
+);
+
+alert(
+"Error generating result"
+);
+
 });
 
 }
 
 
+
 // =========================
-// LOAD RESULT
+// RESULT
 // =========================
 
 function loadDebateResult(){
@@ -484,10 +490,6 @@ room
 
 }
 
-
-// =========================
-// SHOW RESULT
-// =========================
 
 function showResult(room){
 
@@ -545,17 +547,114 @@ document.getElementById(
 
 .disabled=true;
 
-
-document.getElementById(
-"endBtn"
-)
-
-.disabled=true;
 }
 
 
+
 // =========================
-// START
+// VOICE INPUT
+// =========================
+
+function startVoice(){
+
+if(isListening){
+
+recognition.stop();
+
+isListening=false;
+
+document.getElementById(
+"voiceBtn"
+)
+
+.innerText=
+"🎤 Speak";
+
+return;
+}
+
+isListening=true;
+
+document.getElementById(
+"voiceBtn"
+)
+
+.innerText=
+"⏹ Stop";
+
+recognition.start();
+
+}
+
+
+recognition.onresult=
+
+function(event){
+
+let text="";
+
+for(
+
+let i=
+event.resultIndex;
+
+i<
+event.results.length;
+
+i++
+
+){
+
+text+=
+
+event.results[i][0]
+.transcript;
+
+}
+
+document.getElementById(
+"messageInput"
+)
+
+.value=
+text;
+
+};
+
+
+recognition.onend=
+
+function(){
+
+if(
+isListening
+){
+
+recognition.start();
+}
+
+};
+
+
+// =========================
+// BUTTON
+// =========================
+
+document.getElementById(
+"voiceBtn"
+)
+
+.addEventListener(
+
+"click",
+
+startVoice
+
+);
+
+
+// =========================
+// INIT
 // =========================
 
 connect();
