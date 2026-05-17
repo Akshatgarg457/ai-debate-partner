@@ -33,7 +33,9 @@ public class DebateController {
 
                 body.get("topic"),
 
-                body.get("argument")
+                body.get("argument"),
+
+                body.get("side")
         );
     }
 
@@ -62,8 +64,6 @@ public class DebateController {
                         "guest"
                 );
 
-        // AI ANALYSIS
-
         String resultText =
 
                 groqService.analyzeDebate(
@@ -73,11 +73,12 @@ public class DebateController {
                         aiArg
                 );
 
-        String winner = "AI";
+        String winner="AI";
 
         if(resultText!=null){
 
-            if(resultText.toLowerCase()
+            if(resultText
+                    .toLowerCase()
                     .contains(
                             "winner: user"
                     )){
@@ -85,19 +86,15 @@ public class DebateController {
                 winner="User";
             }
 
-            else if(
-                    resultText
-                            .toLowerCase()
-                            .contains(
-                                    "winner: ai"
-                            )
-            ){
+            else if(resultText
+                    .toLowerCase()
+                    .contains(
+                            "winner: ai"
+                    )){
 
                 winner="AI";
             }
         }
-
-        // SAVE DATABASE
 
         Debate debate =
                 new Debate();
@@ -130,10 +127,8 @@ public class DebateController {
                 debate
         );
 
-        // RESPONSE
-
         Map<String,String>
-                response =
+                response=
                 new HashMap<>();
 
         response.put(
@@ -159,23 +154,26 @@ public class DebateController {
     // =========================
 
     @GetMapping("/history")
-    public List<Debate> getHistory(){
+    public List<Debate>
+    getHistory(){
 
         return debateRepository
                 .findAll();
     }
 
     // =========================
-    // LAST RESULT
+    // LAST
     // =========================
 
     @GetMapping("/last")
-    public Debate getLastResult(){
+    public Debate
+    getLastResult(){
 
-        List<Debate> debates =
+        List<Debate>
+        debates=
 
-                debateRepository
-                        .findAll();
+        debateRepository
+                .findAll();
 
         if(
                 debates.isEmpty()
@@ -188,5 +186,4 @@ public class DebateController {
                 debates.size()-1
         );
     }
-
 }

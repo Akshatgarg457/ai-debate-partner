@@ -11,10 +11,6 @@
 
 <body>
 
-<!-- ========================= -->
-<!-- HEADER -->
-<!-- ========================= -->
-
 <div class="header">
 
     <h2 id="modeTitle">
@@ -30,10 +26,6 @@
 
 </div>
 
-<!-- ========================= -->
-<!-- MAIN -->
-<!-- ========================= -->
-
 <div class="container">
 
     <h1>
@@ -44,13 +36,11 @@
         Topic: Loading...
     </h2>
 
-    <!-- CHAT -->
+    <h3 id="sideTitle"></h3>
 
     <div id="chatBox"
          class="chat-box">
     </div>
-
-    <!-- INPUT -->
 
     <div class="input-section">
 
@@ -58,35 +48,24 @@
                   placeholder="Type or speak your argument...">
         </textarea>
 
-        <!-- BUTTON GROUP -->
-
         <div class="button-group">
-
-            <!-- SEND -->
 
             <button onclick="sendArgument()"
                     id="sendBtn">
 
                 Send
-
             </button>
-
-            <!-- VOICE -->
 
             <button onclick="startVoiceInput()"
                     id="voiceBtn">
 
                 🎤 Speak
-
             </button>
-
-            <!-- END -->
 
             <button onclick="endDebate()"
                     class="end-btn">
 
                 End Debate
-
             </button>
 
         </div>
@@ -95,500 +74,462 @@
 
 </div>
 
-<!-- ========================= -->
-<!-- RESULT -->
-<!-- ========================= -->
-
 <div id="resultBox"
      class="result-bottom">
 </div>
 
 <script>
 
-// =========================
-// INIT
-// =========================
+// ======================
+// URL PARAMS
+// ======================
 
 const params =
-    new URLSearchParams(
-        window.location.search
-    );
+new URLSearchParams(
+window.location.search
+);
 
 let topic =
-    params.get("topic")
-    || "General Debate";
+params.get("topic")
+|| "General Debate";
 
 let mode =
-    params.get("mode")
-    || "ai";
+params.get("mode")
+|| "ai";
 
-// USERNAME
+let side =
+params.get("side")
+|| "for";
 
 let username =
-    localStorage.getItem("username")
-    || "guest";
+localStorage.getItem(
+"username"
+)
+|| "guest";
 
-// LAST ARGS
+let lastUserArg="";
+let lastAiArg="";
+let isLoading=false;
 
-let lastUserArg = "";
-let lastAiArg = "";
 
-let isLoading = false;
-
-// =========================
-// SET UI
-// =========================
-
-document.getElementById(
-    "topicTitle"
-).innerText =
-    "Topic: " + topic;
+// ======================
+// UI
+// ======================
 
 document.getElementById(
-    "modeTitle"
-).innerText =
+"topicTitle"
+).innerText=
 
-    mode === "human"
+"Topic: "
++topic;
 
-    ? "Human Debate 👥"
+document.getElementById(
+"modeTitle"
+).innerText=
 
-    : "AI Debate 🤖";
+mode==="human"
 
-// =========================
-// APPEND MESSAGE
-// =========================
+?
 
-function appendMsg(type, text){
+"Human Debate 👥"
 
-    const chat =
-        document.getElementById(
-            "chatBox"
-        );
+:
 
-    chat.innerHTML += `
+"AI Debate 🤖";
 
-        <div class="msg ${type}">
 
-            ${text}
+document.getElementById(
+"sideTitle"
+).innerHTML=
 
-        </div>
-    `;
+side==="for"
 
-    // AUTO SCROLL
+?
 
-    chat.scrollTop =
-        chat.scrollHeight;
+"🟢 Your Side: In Favor"
+
+:
+
+"🔴 Your Side: Against";
+
+
+// ======================
+// CHAT
+// ======================
+
+function appendMsg(
+type,
+text
+){
+
+let chat=
+
+document.getElementById(
+"chatBox"
+);
+
+chat.innerHTML+=
+
+`<div class="msg ${type}">
+${text}
+</div>`;
+
+chat.scrollTop=
+chat.scrollHeight;
 }
 
-// =========================
-// AI VOICE OUTPUT
-// =========================
 
-function speakText(text){
+// ======================
+// SPEAK OUTPUT
+// ======================
 
-    // STOP OLD SPEECH
+function speakText(
+text
+){
 
-    window.speechSynthesis.cancel();
+window
+.speechSynthesis
+.cancel();
 
-    const speech =
-        new SpeechSynthesisUtterance(
-            text
-        );
+const speech=
 
-    speech.lang = "en-US";
+new SpeechSynthesisUtterance(
+text
+);
 
-    speech.rate = 1;
+speech.lang=
+"en-US";
 
-    speech.pitch = 1;
-
-    window.speechSynthesis
-        .speak(speech);
+window
+.speechSynthesis
+.speak(
+speech
+);
 }
 
-// =========================
-// VOICE INPUT
-// =========================
+
+// ======================
+// LONG VOICE INPUT
+// ======================
+
+let recognition;
 
 function startVoiceInput(){
 
-    // SUPPORT CHECK
+const SpeechRecognition=
 
-    const SpeechRecognition =
+window.SpeechRecognition
+||
+window.webkitSpeechRecognition;
 
-        window.SpeechRecognition
-        || window.webkitSpeechRecognition;
+if(!SpeechRecognition){
 
-    if(!SpeechRecognition){
+alert(
+"Voice not supported"
+);
 
-        alert(
-            "Voice recognition not supported in this browser."
-        );
-
-        return;
-    }
-
-    // CREATE INSTANCE
-
-    const recognition =
-        new SpeechRecognition();
-
-    recognition.lang = "en-US";
-
-    recognition.continuous = false;
-
-    recognition.interimResults = false;
-
-    // BUTTON
-
-    const voiceBtn =
-        document.getElementById(
-            "voiceBtn"
-        );
-
-    voiceBtn.innerText =
-        "🎙 Listening...";
-
-    // START
-
-    recognition.start();
-
-    // RESULT
-
-    recognition.onresult =
-        function(event){
-
-        const transcript =
-
-            event.results[0][0]
-                .transcript;
-
-        // PUT TEXT
-
-        document.getElementById(
-            "argument"
-        ).value = transcript;
-
-        // RESET BUTTON
-
-        voiceBtn.innerText =
-            "🎤 Speak";
-
-        // AUTO SEND
-
-        sendArgument();
-    };
-
-    // ERROR
-
-    recognition.onerror =
-        function(event){
-
-        console.log(
-            "Voice Error:",
-            event.error
-        );
-
-        voiceBtn.innerText =
-            "🎤 Speak";
-
-        alert(
-            "Voice input error: "
-            + event.error
-        );
-    };
-
-    // END
-
-    recognition.onend =
-        function(){
-
-        voiceBtn.innerText =
-            "🎤 Speak";
-    };
+return;
 }
 
-// =========================
-// SEND ARGUMENT
-// =========================
+recognition=
+
+new SpeechRecognition();
+
+recognition.continuous=true;
+
+recognition.interimResults=true;
+
+recognition.lang=
+"en-US";
+
+let finalText="";
+
+const voiceBtn=
+
+document.getElementById(
+"voiceBtn"
+);
+
+voiceBtn.innerText=
+"🎙 Listening...";
+
+recognition.start();
+
+recognition.onresult=
+function(event){
+
+let interim="";
+
+for(
+
+let i=
+event.resultIndex;
+
+i<
+event.results.length;
+
+i++
+){
+
+let transcript=
+
+event.results[i][0]
+.transcript;
+
+if(
+event.results[i]
+.isFinal
+){
+
+finalText+=
+transcript
++" ";
+}
+
+else{
+
+interim+=
+transcript;
+}
+
+}
+
+document.getElementById(
+"argument"
+).value=
+
+finalText
++
+interim;
+};
+
+voiceBtn.onclick=
+function(){
+
+recognition.stop();
+
+voiceBtn.innerText=
+"🎤 Speak";
+};
+
+recognition.onend=
+function(){
+
+voiceBtn.innerText=
+"🎤 Speak";
+};
+}
+
+
+// ======================
+// SEND
+// ======================
 
 function sendArgument(){
 
-    if(isLoading) return;
+if(isLoading)
+return;
 
-    const input =
-        document.getElementById(
-            "argument"
-        );
+let input=
 
-    const text =
-        input.value.trim();
+document.getElementById(
+"argument"
+);
 
-    if(text === "") return;
+let text=
+input.value.trim();
 
-    // SAVE USER ARG
+if(text==="")
+return;
 
-    lastUserArg = text;
+lastUserArg=
+text;
 
-    // SHOW USER
+appendMsg(
 
-    appendMsg(
+"user",
 
-        "user",
+`<b>You:</b><br>${text}`
+);
 
-        `<b>You:</b><br>${text}`
-    );
+input.value="";
 
-    input.value = "";
+isLoading=true;
 
-    // HUMAN MODE
+let typingId=
 
-    if(mode === "human"){
+"typing"
 
-        appendMsg(
++
+Date.now();
 
-            "opponent",
+appendMsg(
 
-            `<b>Opponent:</b><br>${text}`
-        );
+"ai",
 
-        return;
-    }
+`<span id="${typingId}">
+<b>AI:</b>
+typing...
+</span>`
+);
 
-    // LOADING
+fetch(
 
-    isLoading = true;
+"/api/debate/reply",
 
-    document.getElementById(
-        "sendBtn"
-    ).disabled = true;
+{
 
-    // AI TYPING
+method:"POST",
 
-    const typingId =
-        "typing-" + Date.now();
+headers:{
 
-    appendMsg(
+"Content-Type":
+"application/json"
+},
 
-        "ai",
+body:
+JSON.stringify({
 
-        `<span id="${typingId}">
-            <b>AI:</b><br>
-            typing...
-        </span>`
-    );
+topic:
+topic,
 
-    // API CALL
+argument:
+text,
 
-    fetch("/api/debate/reply", {
+side:
+side
+})
+}
+)
 
-        method:"POST",
+.then(
+res=>res.text()
+)
 
-        headers:{
-            "Content-Type":
-                "application/json"
-        },
+.then(
+data=>{
 
-        body: JSON.stringify({
+lastAiArg=
+data;
 
-            topic: topic,
-            argument: text
-        })
-    })
+document
+.getElementById(
+typingId
+)
 
-    .then(res => res.text())
+.innerHTML=
 
-    .then(data => {
+`<b>AI:</b><br>
+${data}`;
 
-        // CLEAN TEXT
+speakText(
+data
+);
+}
+)
 
-        data = data
-            .replace(/\n/g, "<br>")
-            .trim();
+.catch(()=>{
 
-        // REMOVE REPETITION
+document
+.getElementById(
+typingId
+)
 
-        if(
-            data.toLowerCase()
-                .includes(
-                    "i strongly disagree"
-                )
-        ){
+.innerHTML=
 
-            data = data.replace(
+"AI Error";
+})
 
-                /i strongly disagree/gi,
+.finally(()=>{
 
-                "That argument fails because"
-            );
-        }
-
-        // SAVE AI ARG
-
-        lastAiArg = data;
-
-        // SHOW AI
-
-        document.getElementById(
-            typingId
-        ).innerHTML =
-
-            `<b>AI:</b><br>${data}`;
-
-        // AI SPEAKS
-
-        speakText(
-            data.replace(/<br>/g, " ")
-        );
-    })
-
-    .catch(() => {
-
-        document.getElementById(
-            typingId
-        ).innerHTML =
-
-            "Error: AI not responding";
-    })
-
-    .finally(() => {
-
-        isLoading = false;
-
-        document.getElementById(
-            "sendBtn"
-        ).disabled = false;
-    });
+isLoading=
+false;
+});
 }
 
-// =========================
-// END DEBATE
-// =========================
+
+// ======================
+// END
+// ======================
 
 function endDebate(){
 
-    if(!lastUserArg || !lastAiArg){
+if(
+!lastUserArg
+||
+!lastAiArg
+){
 
-        alert(
-            "Complete at least one round!"
-        );
+alert(
+"Complete one round first"
+);
 
-        return;
-    }
+return;
+}
 
-    // LOADING RESULT
+fetch(
 
-    document.getElementById(
-        "resultBox"
-    ).innerHTML = `
+"/api/debate/analyze",
 
-        <div class="result-card">
+{
 
-            <h2>
-                🏆 Debate Result
-            </h2>
+method:"POST",
 
-            <p>
-                Analyzing debate...
-            </p>
+headers:{
 
-        </div>
-    `;
+"Content-Type":
+"application/json"
+},
 
-    // API CALL
+body:
+JSON.stringify({
 
-    fetch("/api/debate/analyze", {
+topic:
+topic,
 
-        method:"POST",
+userArg:
+lastUserArg,
 
-        headers:{
-            "Content-Type":
-                "application/json"
-        },
+aiArg:
+lastAiArg,
 
-        body: JSON.stringify({
+username:
+username
+})
+}
+)
 
-            topic: topic,
-            userArg: lastUserArg,
-            aiArg: lastAiArg,
-            username: username
-        })
-    })
+.then(
+res=>res.json()
+)
 
-    .then(res => res.json())
+.then(
+data=>{
 
-    .then(data => {
+document
+.getElementById(
+"resultBox"
+)
 
-        // FORMAT RESULT
+.innerHTML=
 
-        let formattedResult =
+`<div class="result-card">
 
-            data.result
+<h2>
+🏆 Debate Result
+</h2>
 
-            .replace(/\n/g, "<br>")
+<p>
 
-            .replace(
-                /Winner:/g,
+${data.result}
 
-                "<br><br><b>🏆 Winner:</b>"
-            )
+</p>
 
-            .replace(
-                /Reason:/g,
-
-                "<br><br><b>💬 Reason:</b>"
-            )
-
-            .replace(
-                /Score:/g,
-
-                "<br><br><b>📊 Score:</b>"
-            );
-
-        // SHOW RESULT
-
-        document.getElementById(
-            "resultBox"
-        ).innerHTML = `
-
-            <div class="result-card">
-
-                <h2>
-                    🏆 Debate Result
-                </h2>
-
-                <div class="judge-result">
-
-                    ${formattedResult}
-
-                </div>
-
-            </div>
-        `;
-    })
-
-    .catch(() => {
-
-        document.getElementById(
-            "resultBox"
-        ).innerHTML = `
-
-            <div class="result-card">
-
-                <h2>
-                    ❌ Error
-                </h2>
-
-                <p>
-                    Error analyzing debate.
-                </p>
-
-            </div>
-        `;
-    });
+</div>`;
+});
 }
 
 </script>
 
 </body>
 </html>
-

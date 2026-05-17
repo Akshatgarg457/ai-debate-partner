@@ -7,7 +7,6 @@
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
     <h2>🎯 Select Debate Topic</h2>
     <a href="/dashboard" class="back-btn">← Back</a>
@@ -15,9 +14,10 @@
 
 <div class="container">
 
-    <h1 class="title">Choose a Topic</h1>
+    <h1 class="title">
+        Choose a Topic
+    </h1>
 
-    <!-- TOPIC GRID -->
     <div class="topic-container">
 
         <div class="topic-card" onclick="selectTopic(this)">
@@ -46,87 +46,118 @@
 
     </div>
 
-    <!-- CUSTOM TOPIC -->
-    <div class="custom-section">
+    <br>
 
-        <input
-            type="text"
-            id="customTopic"
-            placeholder="Or enter your own topic..."
-        >
+    <h3>Select Your Side</h3>
+
+    <div style="display:flex;justify-content:center;gap:30px;">
+
+        <label>
+
+            <input type="radio"
+                   name="side"
+                   value="for"
+                   checked>
+
+            In Favor
+
+        </label>
+
+        <label>
+
+            <input type="radio"
+                   name="side"
+                   value="against">
+
+            Against
+
+        </label>
 
     </div>
 
-    <!-- START BUTTON -->
-    <button class="start-btn" onclick="startDebate()">
+    <br>
+
+    <input
+        type="text"
+        id="customTopic"
+        placeholder="Or enter your own topic..."
+    >
+
+    <br><br>
+
+    <button
+        class="start-btn"
+        onclick="startDebate()">
+
         Start Debate 🚀
+
     </button>
 
 </div>
 
 <script>
 
-let selectedTopic = "";
+let selectedTopic="";
 
-// =========================
-// SELECT TOPIC
-// =========================
 function selectTopic(element){
 
-    // REMOVE OLD ACTIVE
-    document.querySelectorAll(".topic-card").forEach(card => {
-        card.classList.remove("active");
+    document
+    .querySelectorAll(
+        ".topic-card"
+    )
+    .forEach(card=>{
+
+        card.classList.remove(
+            "active"
+        );
     });
 
-    // ADD ACTIVE
-    element.classList.add("active");
+    element.classList.add(
+        "active"
+    );
 
-    // SAVE TOPIC
-    selectedTopic = element.innerText;
+    selectedTopic=
+        element.innerText;
 }
 
-// =========================
-// START DEBATE
-// =========================
 function startDebate(){
 
-    const custom =
-        document.getElementById("customTopic").value;
+    let custom =
+        document.getElementById(
+            "customTopic"
+        ).value;
 
-    // CUSTOM TOPIC
-    if(custom.trim() !== ""){
-        selectedTopic = custom;
+    if(custom.trim()!=""){
+
+        selectedTopic=
+            custom;
     }
 
-    // VALIDATION
-    if(selectedTopic === ""){
-        alert("Please select or enter a topic!");
+    if(selectedTopic==""){
+
+        alert(
+            "Select topic"
+        );
+
         return;
     }
 
-    // GET MODE
-    const params =
-        new URLSearchParams(window.location.search);
+    let side =
 
-    const mode = params.get("mode") || "ai";
+        document.querySelector(
 
-    // =========================
-    // AI MODE
-    // =========================
-    if(mode === "ai"){
+            'input[name="side"]:checked'
 
-        window.location.href =
-            `/debate?topic=${encodeURIComponent(selectedTopic)}&mode=ai`;
-    }
+        ).value;
 
-    // =========================
-    // HUMAN MODE
-    // =========================
-    else{
+    window.location.href=
 
-        window.location.href =
-            `/create-room?topic=${encodeURIComponent(selectedTopic)}`;
-    }
+    `/debate?topic=${
+        encodeURIComponent(
+            selectedTopic
+        )
+    }&mode=ai&side=${side}`;
+
 }
 
 </script>
