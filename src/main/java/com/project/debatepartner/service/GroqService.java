@@ -22,11 +22,13 @@ public class GroqService {
     // =========================
     // MAIN API CALL
     // =========================
+
     public String callGroq(String prompt){
 
         try{
 
             if(apiKey == null || apiKey.isEmpty()){
+
                 return "Groq API key missing.";
             }
 
@@ -37,15 +39,24 @@ public class GroqService {
                     MediaType.APPLICATION_JSON
             );
 
-            headers.setBearerAuth(apiKey);
+            headers.setBearerAuth(
+                    apiKey
+            );
 
-            Map<String, String> message =
+            Map<String,String> message =
                     new HashMap<>();
 
-            message.put("role", "user");
-            message.put("content", prompt);
+            message.put(
+                    "role",
+                    "user"
+            );
 
-            Map<String, Object> body =
+            message.put(
+                    "content",
+                    prompt
+            );
+
+            Map<String,Object> body =
                     new HashMap<>();
 
             body.put(
@@ -55,44 +66,76 @@ public class GroqService {
 
             body.put(
                     "messages",
-                    Collections.singletonList(message)
+                    Collections.singletonList(
+                            message
+                    )
             );
 
+            // Slight creativity
             body.put(
                     "temperature",
-                    0.5
+                    0.7
             );
 
-            HttpEntity<Map<String, Object>> request =
-                    new HttpEntity<>(body, headers);
+            // Limit huge outputs
+            body.put(
+                    "max_tokens",
+                    120
+            );
+
+            HttpEntity<Map<String,Object>>
+                    request =
+
+                    new HttpEntity<>(
+                            body,
+                            headers
+                    );
 
             ResponseEntity<Map> response =
+
                     restTemplate.exchange(
+
                             API_URL,
                             HttpMethod.POST,
                             request,
                             Map.class
                     );
 
-            if(response.getBody() == null){
+            if(response.getBody()==null){
+
                 return "Empty AI response.";
             }
 
             List choices =
-                    (List) response.getBody()
-                            .get("choices");
 
-            if(choices == null || choices.isEmpty()){
+                    (List)
+                            response.getBody()
+                                    .get(
+                                            "choices"
+                                    );
+
+            if(
+                    choices==null
+                            ||
+                            choices.isEmpty()
+            ){
+
                 return "No AI response.";
             }
 
             Map choice =
-                    (Map) choices.get(0);
+                    (Map)
+                            choices.get(0);
 
             Map msg =
-                    (Map) choice.get("message");
+                    (Map)
+                            choice.get(
+                                    "message"
+                            );
 
-            return msg.get("content").toString();
+            return msg
+                    .get("content")
+                    .toString();
         }
 
         catch(Exception e){
@@ -104,73 +147,117 @@ public class GroqService {
     }
 
     // =========================
-    // AI DEBATE RESPONSE
+    // HUMAN-LIKE AI DEBATE
     // =========================
-    public String getDebateResponse(String topic,
-                                    String userArgument){
+
+    public String getDebateResponse(
+            String topic,
+            String userArgument
+    ){
 
         String prompt =
 
-                "You are an intelligent debate opponent.\n\n" +
+                "You are a human debate opponent.\n\n"+
 
-                "Topic: " + topic + "\n\n" +
+                "Rules:\n"+
 
-                "User Argument:\n" +
-                userArgument + "\n\n" +
+                "- Keep response short.\n"+
 
-                "Reply professionally with a strong counter argument.";
+                "- Maximum 2 to 4 sentences only.\n"+
+
+                "- Speak naturally like a student.\n"+
+
+                "- Do not write essays.\n"+
+
+                "- Give logical counter arguments.\n"+
+
+                "- Do not say 'Greetings', 'I respectfully disagree', or formal words.\n"+
+
+                "- Sound like a real person arguing.\n"+
+
+                "- Avoid repeating the user's argument.\n\n"+
+
+                "Topic: "
+                + topic +
+
+                "\n\nOpponent argument:\n"
+
+                + userArgument +
+
+                "\n\nYour response:";
 
         return callGroq(prompt);
     }
 
     // =========================
-    // ANALYZE DEBATE
+    // AI JUDGE
     // =========================
-    public String analyzeDebate(String topic,
-                                String userArg,
-                                String aiArg){
+
+    public String analyzeDebate(
+
+            String topic,
+            String userArg,
+            String aiArg
+    ){
 
         String prompt =
 
-                "You are an AI debate judge.\n\n" +
+                "You are a debate judge.\n\n"+
 
-                "Topic: " + topic + "\n\n" +
+                "Topic:\n"
 
-                "User Argument:\n" +
-                userArg + "\n\n" +
+                + topic +
 
-                "AI Argument:\n" +
-                aiArg + "\n\n" +
+                "\n\nUser argument:\n"
 
-                "Give:\n" +
-                "1. Winner\n" +
-                "2. Reason\n" +
-                "3. Score";
+                + userArg +
 
-        return callGroq(prompt);
+                "\n\nAI argument:\n"
+
+                + aiArg +
+
+                "\n\nGive:\n"+
+
+                "Winner:\n"+
+                "Reason:\n"+
+                "Score:";
+        
+        return callGroq(
+                prompt
+        );
     }
 
     // =========================
     // HUMAN VS HUMAN JUDGE
     // =========================
-    public String judgeHumanDebate(String topic,
-                                   String fullDebate){
+
+    public String judgeHumanDebate(
+
+            String topic,
+            String fullDebate
+    ){
 
         String prompt =
 
-                "You are an AI debate judge.\n\n" +
+                "You are a debate judge.\n\n"+
 
-                "Topic:\n" +
-                topic + "\n\n" +
+                "Topic:\n"
 
-                "Debate Messages:\n" +
-                fullDebate + "\n\n" +
+                + topic +
 
-                "Give:\n" +
-                "1. Winner\n" +
-                "2. Reason\n" +
-                "3. Score";
+                "\n\nDebate:\n"
 
-        return callGroq(prompt);
+                + fullDebate +
+
+                "\n\nGive:\n"+
+
+                "Winner:\n"+
+                "Reason:\n"+
+                "Score:";
+
+        return callGroq(
+                prompt
+        );
     }
+
 }
