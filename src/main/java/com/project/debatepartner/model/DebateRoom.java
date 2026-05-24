@@ -7,25 +7,57 @@ import java.util.UUID;
 public class DebateRoom {
 
     private String roomId;
-    private String topic;
-    private String player1;
-    private String player2;
-    private boolean started = false;
 
-    private List<Message> messages = new ArrayList<>();
+    private String topic;
+
+    private String player1;
+
+    private String player2;
+
+    private boolean started;
+
+    private List<Message> messages =
+            new ArrayList<>();
+
+
+    // ADD THESE
 
     private String result;
+
     private String winner;
 
-    public DebateRoom() {
-        this.roomId = UUID.randomUUID().toString();
+
+
+    public DebateRoom(
+            String topic,
+            String username
+    ){
+
+        this.roomId=
+                UUID.randomUUID()
+                .toString();
+
+        this.topic=
+                topic;
+
+        this.player1=
+                username;
+
+        this.started=
+                false;
     }
 
-    public DebateRoom(String topic, String player1) {
-        this.roomId = UUID.randomUUID().toString();
-        this.topic = topic;
-        this.player1 = player1;
+
+    public void addMessage(
+            Message msg
+    ){
+
+        messages.add(msg);
     }
+
+
+
+    // GETTERS / SETTERS
 
     public String getRoomId() {
         return roomId;
@@ -43,47 +75,47 @@ public class DebateRoom {
         return player2;
     }
 
+    public void setPlayer2(
+            String player2
+    ){
+        this.player2=player2;
+    }
+
     public boolean isStarted() {
         return started;
+    }
+
+    public void setStarted(
+            boolean started
+    ){
+        this.started=started;
     }
 
     public List<Message> getMessages() {
         return messages;
     }
 
+
+    // RESULT
+
     public String getResult() {
         return result;
+    }
+
+    public void setResult(
+            String result
+    ){
+        this.result=result;
     }
 
     public String getWinner() {
         return winner;
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public void setWinner(
+            String winner
+    ){
+        this.winner=winner;
     }
 
-    public void setPlayer1(String player1) {
-        this.player1 = player1;
-    }
-
-    public void setPlayer2(String player2) {
-        this.player2 = player2;
-    }
-
-    public void setStarted(boolean started) {
-        this.started = started;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public void setWinner(String winner) {
-        this.winner = winner;
-    }
-
-    public void addMessage(Message message) {
-        this.messages.add(message);
-    }
 }

@@ -1,121 +1,186 @@
-package com.project.debatepartner.model;
+package com.project.debatepartner.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.project.debatepartner.model.DebateRoom;
+import com.project.debatepartner.model.Message;
 
-public class DebateRoom {
+import org.springframework.stereotype.Service;
 
-    private String roomId;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-    private String topic;
+@Service
+public class DebateRoomService {
 
-    private String player1;
+    // Store active rooms in memory
 
-    private String player2;
-
-    private boolean started;
-
-    private List<Message> messages =
-            new ArrayList<>();
+    private final Map<String, DebateRoom> rooms =
+            new ConcurrentHashMap<>();
 
 
-    // ADD THESE
+    // ======================
+    // CREATE ROOM
+    // ======================
 
-    private String result;
+    public DebateRoom createRoom(
 
-    private String winner;
-
-
-
-    public DebateRoom(
             String topic,
+
             String username
     ){
 
-        this.roomId=
-                UUID.randomUUID()
-                .toString();
+        DebateRoom room =
 
-        this.topic=
-                topic;
+                new DebateRoom(
 
-        this.player1=
-                username;
+                        topic,
 
-        this.started=
-                false;
+                        username
+                );
+
+        rooms.put(
+
+                room.getRoomId(),
+
+                room
+        );
+
+        return room;
     }
 
+
+    // ======================
+    // JOIN ROOM
+    // ======================
+
+    public DebateRoom joinRoom(
+
+            String roomId,
+
+            String username
+    ){
+
+        DebateRoom room =
+
+                rooms.get(
+                        roomId
+                );
+
+        if(
+                room == null
+        ){
+
+            return null;
+        }
+
+
+        // second player joins
+
+        if(
+                room.getPlayer2() == null
+        ){
+
+            room.setPlayer2(
+                    username
+            );
+
+            room.setStarted(
+                    true
+            );
+        }
+
+        return room;
+    }
+
+
+    // ======================
+    // GET ROOM
+    // ======================
+
+    public DebateRoom getRoom(
+
+            String roomId
+    ){
+
+        return rooms.get(
+                roomId
+        );
+    }
+
+
+    // ======================
+    // ADD MESSAGE
+    // ======================
 
     public void addMessage(
-            Message msg
+
+            String roomId,
+
+            Message message
     ){
 
-        messages.add(msg);
+        DebateRoom room =
+
+                rooms.get(
+                        roomId
+                );
+
+        if(
+                room != null
+        ){
+
+            room.addMessage(
+                    message
+            );
+        }
     }
 
 
+    // ======================
+    // SAVE RESULT TO ROOM
+    // ======================
 
-    // GETTERS / SETTERS
+    public void saveResult(
 
-    public String getRoomId() {
-        return roomId;
-    }
+            String roomId,
 
-    public String getTopic() {
-        return topic;
-    }
+            String result,
 
-    public String getPlayer1() {
-        return player1;
-    }
-
-    public String getPlayer2() {
-        return player2;
-    }
-
-    public void setPlayer2(
-            String player2
-    ){
-        this.player2=player2;
-    }
-
-    public boolean isStarted() {
-        return started;
-    }
-
-    public void setStarted(
-            boolean started
-    ){
-        this.started=started;
-    }
-
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-
-    // RESULT
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(
-            String result
-    ){
-        this.result=result;
-    }
-
-    public String getWinner() {
-        return winner;
-    }
-
-    public void setWinner(
             String winner
     ){
-        this.winner=winner;
+
+        DebateRoom room =
+
+                rooms.get(
+                        roomId
+                );
+
+        if(
+                room != null
+        ){
+
+            room.setResult(
+                    result
+            );
+
+            room.setWinner(
+                    winner
+            );
+        }
+    }
+
+
+    // ======================
+    // REMOVE ROOM
+    // ======================
+
+    public void removeRoom(
+
+            String roomId
+    ){
+
+        rooms.remove(
+                roomId
+        );
     }
 
 }
