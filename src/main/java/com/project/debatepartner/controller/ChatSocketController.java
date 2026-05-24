@@ -15,16 +15,19 @@ public class ChatSocketController {
     @Autowired
     private DebateRoomService debateRoomService;
 
+
     // =========================
     // SEND CHAT
     // =========================
+
     @MessageMapping("/chat")
     @SendTo("/topic/messages")
     public SocketMessage sendMessage(
-            SocketMessage message) {
+            SocketMessage message
+    ){
 
-        // SAVE MESSAGE
-        Message msg = new Message();
+        Message msg =
+                new Message();
 
         msg.setSender(
                 message.getSender()
@@ -34,37 +37,56 @@ public class ChatSocketController {
                 message.getContent()
         );
 
-        debateRoomService.sendMessage(
+
+        // FIXED HERE
+        debateRoomService.addMessage(
+
                 message.getRoomId(),
+
                 msg
         );
 
         return message;
     }
 
+
+
     // =========================
     // USER JOIN
     // =========================
+
     @MessageMapping("/join")
     @SendTo("/topic/status")
     public SocketMessage join(
-            SocketMessage message) {
 
-        message.setType("JOIN");
+            SocketMessage message
+    ){
+
+        message.setType(
+                "JOIN"
+        );
 
         return message;
     }
+
+
 
     // =========================
     // END DEBATE
     // =========================
+
     @MessageMapping("/end")
     @SendTo("/topic/end")
     public SocketMessage endDebate(
-            SocketMessage message) {
 
-        message.setType("END");
+            SocketMessage message
+    ){
+
+        message.setType(
+                "END"
+        );
 
         return message;
     }
+
 }
